@@ -1,4 +1,4 @@
-// Sitio de Limpyrid: idioma, menú, «Copiar» y descargas. El mecanismo de los dos idiomas es el del sitio de Tramtai:
+// Sitio de Limpyrid: idioma, tema, menú, «Copiar» y descargas. El mecanismo de los dos idiomas es el del sitio de Tramtai:
 // los dos van en la página (<span lang>) y estilo.css muestra el de <html lang>.
 
 // Idioma: el elegido antes o, si no, el del navegador. Sin almacenamiento disponible también funciona.
@@ -31,6 +31,42 @@
       try { localStorage.setItem('limpyrid.sitio.idioma', b.dataset.idioma); } catch (e) {}
     });
   });
+  // El menú de idioma (un <details>) se cierra al elegir, al pulsar fuera o con Escape, que devuelve el foco a su botón
+  // y no sigue hasta el menú de la barra.
+  var menu = document.querySelector('details.idioma');
+  if (!menu) return;
+  document.addEventListener('click', function (e) { if (!menu.contains(e.target) || e.target.closest('[data-idioma]')) menu.open = false; });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || !menu.open) return;
+    menu.open = false;
+    menu.querySelector('summary').focus();
+    e.stopImmediatePropagation();
+  });
+})();
+
+// Tema: el elegido antes o, si no, el del sistema; el script de <head> ya puso el guardado antes de pintar.
+(function () {
+  var boton = document.querySelector('.tema');
+  if (!boton) return;
+  var sistema = matchMedia('(prefers-color-scheme: dark)');
+  function oscuro() {
+    var tema = document.documentElement.dataset.tema;
+    return tema ? tema === 'oscuro' : sistema.matches;
+  }
+  function pintar() {
+    boton.setAttribute('aria-checked', String(oscuro()));
+    // El color de la barra del navegador en el móvil sigue al fondo.
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
+  }
+  boton.addEventListener('click', function () {
+    var tema = oscuro() ? 'claro' : 'oscuro';
+    document.documentElement.dataset.tema = tema;
+    try { localStorage.setItem('limpyrid.sitio.tema', tema); } catch (e) {}
+    pintar();
+  });
+  sistema.addEventListener('change', pintar);
+  pintar();
 })();
 
 // Menú de la barra en pantallas medianas y pequeñas: se abre con su botón y se cierra al elegir, con Escape o fuera.
