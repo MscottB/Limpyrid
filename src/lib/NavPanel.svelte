@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Navegacion de la mesa de trabajo: marca, disco, Inicio, grupos de limpieza, analisis, idioma y Acerca de.
+  // Navegacion de la mesa de trabajo: marca, disco, Inicio, grupos de limpieza, analisis, idioma, aviso de version y Acerca de.
   // Tambien carga lo que la navegacion muestra (unidades, categorias, worktrees), porque esta siempre a la vista.
   import { tick, untrack, type Component } from 'svelte';
   import House from '@lucide/svelte/icons/house';
@@ -16,6 +16,8 @@
   import { t, LANGS } from './i18n';
   import { formatBytes } from './format';
   import { isDemo } from './api';
+  import { showNotice } from './update';
+  import { openDialog, update } from './update.svelte';
   import * as Select from '$lib/components/ui/select';
   import * as Dialog from '$lib/components/ui/dialog';
   import { Button } from '$lib/components/ui/button';
@@ -194,6 +196,12 @@
         {/each}
       </Select.Content>
     </Select.Root>
+    {#if showNotice(update) && update.info}
+      <!-- Discreto a proposito: no compite con el boton principal de la pantalla. -->
+      <button type="button" data-nav aria-haspopup="dialog" onclick={openDialog} class="flex h-8 w-full items-center rounded-md px-2 text-left text-[12px] text-muted-foreground tabular-nums transition-colors hover:bg-raised hover:text-foreground">
+        <span class="truncate">{t('update.notice', { v: update.info.version })}</span>
+      </button>
+    {/if}
     {@render item('about', Info)}
   </div>
 </nav>

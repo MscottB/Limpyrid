@@ -803,5 +803,15 @@ for (const k of ['check', 'install']) assert.ok(`err.${U.updateErrCode(k)}` in e
 assert.match(readFileSync(new URL('../src/lib/state.svelte.ts', import.meta.url), 'utf8'), /locked = \(\) =>[^\n]*work\.updating/, 'locked incluye work.updating');
 for (const mod of ['@tauri-apps/plugin-updater', '@tauri-apps/plugin-process'])
   assert.deepEqual(srcFiles.filter((f) => readFileSync(new URL(f, srcDir), 'utf8').includes(mod)), ['lib/api.ts'], `${mod} solo se importa en api.ts`);
+// Aviso, dialogo y Acerca de: claves que se eligen con un ternario.
+const UPDATE_KEYS = [
+  'about.updates', 'update.notice', 'update.have', 'update.published', 'update.notes', 'update.install', 'update.openPage', 'update.later',
+  'update.portable', 'update.blockedScan', 'update.blockedClean', 'update.downloading', 'update.downloadedBytes', 'update.restartNote',
+  'update.retry', 'update.check', 'update.checking', 'update.upToDate', 'update.auto', 'update.privacy',
+];
+for (const [name, d] of [['es', es], ['en', en]]) assert.deepEqual(UPDATE_KEYS.filter((k) => !(k in d)), [], `faltan claves de la actualizacion en ${name}.json`);
+// La lista "no hace" ya no dice que no hay ninguna conexion: nombra la consulta de version.
+assert.match(es['about.doesNot.1'], /GitHub/);
+assert.match(en['about.doesNot.1'], /GitHub/);
 
 console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);

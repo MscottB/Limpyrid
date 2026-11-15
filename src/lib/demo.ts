@@ -294,12 +294,28 @@ function applyClean(id: string, items: string[], rep: Report) {
 }
 const sizeOf = (paths: string[]) => paths.reduce((a, p) => a + find(p).size, 0);
 
-// Descarga simulada de 20 MB en 2 s; no instala ni reinicia nada.
+// Texto plano de varias lineas, como el que trae latest.json.
+const UPDATE_NOTES = `El grupo Git dice por qué protege cada worktree.
+La limpieza de Docker informa del espacio recuperado.
+Corrige el tamaño de las carpetas con enlaces simbólicos.
+
+Gracias a quienes informaron de errores.`;
+
+// Para ver cada resultado en demostracion: ?update=none (al dia), ?update=fail (falla la comprobacion),
+// ?update=failinstall (falla la descarga a mitad) y ?portable=1 (variante portable).
+const param = (k: string) => new URLSearchParams(globalThis.location?.search).get(k);
+function demoCheckUpdate() {
+  if (param('update') === 'fail') return later(null, 600).then(() => Promise.reject('update_check_failed'));
+  return later(param('update') === 'none' ? null : { version: '0.2.0', current: '0.1.0', date: '2026-12-01T15:00:00Z', notes: UPDATE_NOTES }, 600);
+}
+
+// Descarga simulada de 20 MB en 6 s (da tiempo a ver el progreso); no instala ni reinicia nada.
 export async function demoInstallUpdate(onProgress: (done: number, total: number | null) => void) {
   const total = 20 * 1048576;
   for (let done = 0; done < total; ) {
-    await later(null, 100);
+    await later(null, 300);
     done += total / 20;
+    if (param('update') === 'failinstall' && done > total / 2) throw 'update_install_failed';
     onProgress(done, total);
   }
 }
@@ -310,8 +326,8 @@ export function demoInvoke<T>(cmd: string, args: Record<string, unknown> = {}): 
   const out = ((): Promise<unknown> => {
     switch (cmd) {
       case 'drives': return later(DRIVES);
-      case 'is_portable': return later(false);
-      case 'check_update': return later({ version: '0.2.0', current: '0.1.0', date: '2026-12-01T00:00:00Z', notes: 'Notas de ejemplo de la version 0.2.0.' }, 600);
+      case 'is_portable': return later(param('portable') != null);
+      case 'check_update': return demoCheckUpdate();
       case 'start_scan': return startScan();
       case 'cancel_scan': finishScan(true); return Promise.resolve();
       case 'denied_paths': return later(DENIED);

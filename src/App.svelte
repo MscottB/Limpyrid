@@ -21,6 +21,7 @@
   import ActionBar from './lib/ActionBar.svelte';
   import { confirm, resolveConfirm } from './lib/guard.svelte';
   import { autoCheck, checkNow } from './lib/update.svelte';
+  import UpdateDialog from './lib/UpdateDialog.svelte';
 
   // Una sola comprobacion de version por apertura, cuando la interfaz ya esta lista; la opcion se lee al vencer el plazo.
   $effect(() => {
@@ -242,6 +243,7 @@
 </div>
 
 <TermsDialog />
+<UpdateDialog />
 <!-- Un solo dialogo: las acciones que borran (guard.svelte.ts) y la confirmacion de escanear una unidad extraible. -->
 <ConfirmDialog request={confirm.req ?? confirmReq} onresolve={(ok) => (confirm.req ? resolveConfirm(ok) : resolveScan(ok))} />
 
