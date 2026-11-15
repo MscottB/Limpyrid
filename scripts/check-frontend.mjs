@@ -773,4 +773,7 @@ for (const lock of [() => (gs.work.busy = true), () => (gs.app.scan.status = 'ru
   gs.app.scan.status = 'done';
 }
 
+// La limpieza de restos del actualizador no puede borrar de forma recursiva.
+assert.ok(!readFileSync(new URL('../src-tauri/src/updates.rs', import.meta.url), 'utf8').includes('remove_dir_all'), 'updates.rs sin remove_dir_all');
+
 console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);

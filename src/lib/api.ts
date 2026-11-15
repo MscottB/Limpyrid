@@ -75,6 +75,7 @@ export const containerPrune = (engine: Engine, allImages: boolean) => call<strin
 export const containerCompact = (engine: Engine) => call<[number, number]>('container_compact', { engine });
 
 export const drives = () => call<Drive[]>('drives');
+export const isPortable = () => call<boolean>('is_portable');
 export const appVersion = () => (isDemo ? Promise.resolve(version) : getVersion());
 export const reveal = (path: string) => (isDemo ? Promise.resolve() : revealItemInDir(path));
 

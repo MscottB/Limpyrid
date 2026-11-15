@@ -300,6 +300,7 @@ export function demoInvoke<T>(cmd: string, args: Record<string, unknown> = {}): 
   const out = ((): Promise<unknown> => {
     switch (cmd) {
       case 'drives': return later(DRIVES);
+      case 'is_portable': return later(false);
       case 'start_scan': return startScan();
       case 'cancel_scan': finishScan(true); return Promise.resolve();
       case 'denied_paths': return later(DENIED);

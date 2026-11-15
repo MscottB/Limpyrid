@@ -4,6 +4,7 @@ pub mod commands;
 pub mod containers;
 pub mod drives;
 pub mod scan;
+pub mod updates;
 pub mod worktrees;
 
 use commands::{AppState, CategoryInfo, Entry};
@@ -137,11 +138,24 @@ fn denied_paths(state: State<AppState>) -> Vec<String> {
     commands::denied_paths(&state)
 }
 
+#[tauri::command]
+fn is_portable() -> bool {
+    std::env::current_exe().ok().and_then(|exe| exe.parent().map(updates::is_portable)).unwrap_or(false)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(AppState::default())
+        .setup(|app| {
+            // Mismo nombre que usa el actualizador para sus carpetas temporales.
+            let name = app.package_info().name.clone();
+            std::thread::spawn(move || {
+                let _ = updates::clean_leftovers(&std::env::temp_dir(), &name);
+            });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             start_scan,
             cancel_scan,
@@ -156,7 +170,8 @@ pub fn run() {
             container_prune,
             container_compact,
             drives,
-            denied_paths
+            denied_paths,
+            is_portable
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
