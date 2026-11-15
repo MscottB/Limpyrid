@@ -6,18 +6,20 @@ use std::path::{Path, PathBuf};
 const REPARSE_POINT: u32 = 0x400;
 const DIRECTORY: u32 = 0x10;
 
-// `<app>-<version>-updater-<sufijo>`, version y sufijo no vacios.
-fn leftover_name(name: &str, app: &str) -> bool {
-    let name = name.to_ascii_lowercase();
-    let Some(rest) = name.strip_prefix(&format!("{}-", app.to_ascii_lowercase())) else { return false };
-    rest.split_once("-updater-").is_some_and(|(version, suffix)| !version.is_empty() && !suffix.is_empty())
+// Lo que sigue a `<app>-`, en minusculas, si empieza por un digito: asi `Limpyrid-Pro-1.0` no pasa por Limpyrid.
+fn after_app(name: &str, app: &str) -> Option<String> {
+    let rest = name.to_ascii_lowercase().strip_prefix(&format!("{}-", app.to_ascii_lowercase()))?.to_string();
+    rest.starts_with(|c: char| c.is_ascii_digit()).then_some(rest)
 }
 
-// `<app>-...-installer.exe|msi`; el prefijo y la terminacion no pueden solaparse.
+// `<app>-<version>-updater-<sufijo>`, version y sufijo no vacios.
+fn leftover_name(name: &str, app: &str) -> bool {
+    after_app(name, app).is_some_and(|rest| rest.split_once("-updater-").is_some_and(|(_, suffix)| !suffix.is_empty()))
+}
+
+// `<app>-<version>-installer.exe|msi`.
 fn installer_name(name: &str, app: &str) -> bool {
-    let name = name.to_ascii_lowercase();
-    name.strip_prefix(&format!("{}-", app.to_ascii_lowercase()))
-        .is_some_and(|rest| rest.ends_with("-installer.exe") || rest.ends_with("-installer.msi"))
+    after_app(name, app).is_some_and(|rest| rest.ends_with("-installer.exe") || rest.ends_with("-installer.msi"))
 }
 
 // Archivos de la carpeta con su tamano, o None si dentro hay algo que no sea un instalador normal o no se puede leer.
@@ -37,8 +39,12 @@ fn installers(dir: &Path, app: &str) -> Option<Vec<(PathBuf, u64)>> {
 
 // Borra las carpetas que deja el actualizador en `base` (reglas en el spec, "Limpieza de restos"), sin borrado
 // recursivo. Devuelve (carpetas borradas, bytes liberados); lo que falla se deja para el siguiente arranque.
+// Release compila con panic = "abort": un panico aqui cierra la app aunque corra en otro hilo.
 pub fn clean_leftovers(base: &Path, app: &str) -> (usize, u64) {
     let mut done = (0, 0);
+    if app.trim().is_empty() {
+        return done;
+    }
     let Ok(entries) = fs::read_dir(base) else { return done };
     for entry in entries.flatten() {
         let dir = entry.path();
@@ -190,6 +196,65 @@ mod tests {
         let base = t.path().join("no-existe");
         assert_eq!(clean_leftovers(&base, "Limpyrid"), (0, 0));
         assert!(!base.exists());
+    }
+
+    #[test]
+    fn app_vacio_no_borra() {
+        let t = tempfile::tempdir().unwrap();
+        let f = t.path().join("-1-updater-x").join("-1-installer.exe");
+        file(&f, 10);
+        assert_eq!(clean_leftovers(t.path(), ""), (0, 0));
+        assert_eq!(clean_leftovers(t.path(), "  "), (0, 0));
+        assert!(f.is_file());
+    }
+
+    #[test]
+    fn otro_producto_con_prefijo() {
+        let t = tempfile::tempdir().unwrap();
+        let f = t.path().join("Limpyrid-Pro-1.0-updater-x").join("Limpyrid-Pro-1.0-installer.exe");
+        file(&f, 10);
+        assert_eq!(clean_leftovers(t.path(), "Limpyrid"), (0, 0));
+        assert!(f.is_file());
+    }
+
+    #[test]
+    fn instalador_de_otra_app_dentro() {
+        let t = tempfile::tempdir().unwrap();
+        let f = t.path().join(DIR).join("Otra-1.0-installer.exe");
+        file(&f, 10);
+        assert_eq!(clean_leftovers(t.path(), "Limpyrid"), (0, 0));
+        assert!(f.is_file());
+    }
+
+    #[test]
+    fn instalador_sin_version() {
+        let t = tempfile::tempdir().unwrap();
+        let f = t.path().join(DIR).join("Limpyrid-installer.exe");
+        file(&f, 10);
+        assert_eq!(clean_leftovers(t.path(), "Limpyrid"), (0, 0));
+        assert!(f.is_file());
+    }
+
+    #[test]
+    fn enlace_dentro_deja_todo() {
+        let (t, u) = (tempfile::tempdir().unwrap(), tempfile::tempdir().unwrap());
+        let destino = u.path().join("destino");
+        file(&destino.join("dato.txt"), 10);
+        let d = t.path().join(DIR);
+        fs::create_dir(&d).unwrap();
+        junction(&d.join(EXE), &destino);
+        assert_eq!(clean_leftovers(t.path(), "Limpyrid"), (0, 0));
+        assert!(fs::symlink_metadata(d.join(EXE)).is_ok(), "la junction sigue");
+        assert!(destino.join("dato.txt").is_file(), "el destino intacto");
+    }
+
+    #[test]
+    fn sufijo_con_updater() {
+        let t = tempfile::tempdir().unwrap();
+        let d = t.path().join("Limpyrid-1.0.0-updater-x-updater-y");
+        file(&d.join("Limpyrid-1.0.0-installer.exe"), 70);
+        assert_eq!(clean_leftovers(t.path(), "Limpyrid"), (1, 70));
+        assert!(!d.exists());
     }
 
     #[test]
