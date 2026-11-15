@@ -1,0 +1,231 @@
+/* Estilos del sitio de Limpyrid: la estructura del sitio de Tramtai (cuadrícula fina arriba, tarjetas de borde
+   discontinuo, rótulos «FIG») con los colores de la app, que es solo oscura. Borde antes que sombra. Cada control mide
+   al menos 44 px de alto. */
+/* Inter variable (OFL, INTER-OFL.txt) para el texto e Instrument Serif cursiva (OFL, INSTRUMENT-OFL.txt) para la parte
+   clave de cada titular. Son subconjuntos: una letra que falte cae en la fuente siguiente de la lista. */
+@font-face { font-family: 'Inter'; src: url('inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Instrument Serif'; src: url('instrument-italica.woff2') format('woff2'); font-style: italic; font-weight: 400; font-display: swap; }
+
+/* Colores: las fichas del tema de la app (src/app.css), con su contraste ya medido (AA: 4,5:1 en texto y 3:1 en bordes
+   de control). Cian para el acento y lo principal, verde para lo que se libera, ámbar para lo que pide atención. */
+:root {
+  --fondo: #0B1220; --superficie: #111B2E; --superficie-suave: #172338;
+  --borde: #1F2C44; --borde-discontinuo: #3A4A68; --borde-control: #5F7392;
+  --texto: #E8EEF7; --texto-suave: #A3B3CC;
+  --acento: #22C9E0; --acento-texto: #06222B; --acento-suave: rgba(34, 201, 224, .1);
+  --azul: #10A0E0; --verde: #20C070; --ambar: #F2B33D;
+  --rejilla: rgba(255, 255, 255, .045);
+  --radio: 10px;
+  --fuente: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --serifa: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --mono: 'Cascadia Mono', ui-monospace, Consolas, 'SF Mono', Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+body { margin: 0; background: var(--fondo); color: var(--texto); font: 1rem/1.6 var(--fuente); overflow-wrap: break-word; -webkit-font-smoothing: antialiased; }
+/* Los dos idiomas van en la página: se ve el de <html lang> (sitio.js lo cambia). */
+html[lang="es"] [lang="en"], html[lang="en"] [lang="es"] { display: none; }
+a { color: var(--acento); }
+.envoltura { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; margin: 0; }
+h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+h3 { font-size: 1.15rem; letter-spacing: -0.01em; }
+p { margin: 0; }
+code { font: .88em var(--mono); }
+.suave { color: var(--texto-suave); }
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+main:focus { outline: none; }
+/* La barra fija no tapa el principio de la sección a la que lleva un ancla. */
+section[id] { scroll-margin-top: 72px; }
+.saltar { position: absolute; left: 16px; top: -10em; z-index: 30; background: var(--acento); color: var(--acento-texto); padding: 10px 16px; border-radius: 8px; font-weight: 600; }
+.saltar:focus { top: 12px; }
+.solo-lectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* El arranque: la cuadrícula de plano, muy tenue y solo arriba, y el brillo del acento detrás del titular. */
+.arranque { position: relative; isolation: isolate; padding: 104px 0 56px; text-align: center; }
+.arranque::before, .arranque::after { content: ''; position: absolute; z-index: -1; pointer-events: none; }
+.arranque::before { inset: 0; background: linear-gradient(90deg, var(--rejilla) 1px, transparent 1px) 0 0 / 56px 56px, linear-gradient(var(--rejilla) 1px, transparent 1px) 0 0 / 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 80% at 50% 0%, #000 35%, transparent 80%); }
+.arranque::after { top: -160px; left: 0; right: 0; margin: 0 auto; width: min(760px, 100%); height: 460px; background: radial-gradient(closest-side, color-mix(in srgb, var(--acento) 18%, transparent), transparent); }
+.arranque.corto { padding: 72px 0 36px; }
+/* El titular en dos partes: la clave, en serifa cursiva y en el acento. */
+.titular { font-size: clamp(2rem, 5.2vw + .7rem, 4.2rem); letter-spacing: -0.03em; line-height: 1.06; }
+h2 em, .titular em { font-family: var(--serifa); font-style: italic; font-weight: 400; letter-spacing: -0.01em; color: var(--acento); }
+.entrada { max-width: 38em; margin: 24px auto 0; font-size: 1.15rem; color: var(--texto-suave); }
+.acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 32px 0 0; }
+.nota { font-size: .875rem; color: var(--texto-suave); }
+.arranque .nota { margin-top: 22px; }
+
+/* Tarjetas: borde fino discontinuo, esquinas de 10 px y sin sombra. */
+.tarjeta { background: var(--superficie); border: 1px dashed var(--borde-discontinuo); border-radius: var(--radio); padding: 22px; min-width: 0; }
+.tarjeta h3 { margin-bottom: 8px; }
+.tarjeta p { color: var(--texto-suave); font-size: .95rem; }
+.tarjeta p + p { margin-top: 8px; }
+a.tarjeta { display: block; color: var(--texto); text-decoration: none; transition: border-color .15s ease; }
+a.tarjeta:hover { border-color: var(--acento); }
+a.tarjeta h3::after { content: ' →'; color: var(--acento); }
+/* El mosaico: --col columnas; .ancha ocupa dos y .entera, la fila. En el móvil, una sola columna. */
+.mosaico { display: grid; grid-template-columns: repeat(var(--col, 3), minmax(0, 1fr)); gap: 12px; }
+.mosaico > .ancha { grid-column: span 2; }
+.mosaico > .entera { grid-column: 1 / -1; }
+@media (max-width: 45em) {
+  .mosaico { grid-template-columns: minmax(0, 1fr); }
+  .mosaico > .ancha { grid-column: auto; }
+}
+/* El rótulo «FIG n · …» sobre cada figura: mayúsculas pequeñas monoespaciadas. */
+.fig { display: block; margin: 0 0 10px; font: 500 .72rem/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-suave); }
+figure.tarjeta { margin: 0; display: flex; flex-direction: column; }
+.fig-pie { margin-top: 14px; font-size: .9rem; }
+.nota-figuras { margin-top: 16px; }
+/* Capturas de la app: la ventana entera ocupa el ancho; un recorte va a su tamaño (o menos si no cabe) y centrado. */
+.captura { margin: auto 0; text-align: center; }
+.captura a { display: block; border-radius: var(--radio); }
+.captura img { display: block; max-width: 100%; height: auto; border: 1px solid color-mix(in srgb, var(--acento) 30%, var(--borde)); border-radius: var(--radio); }
+.captura:not(.recorte) img { width: 100%; }
+/* El recorte está sacado a doble densidad: su tamaño es el de su atributo width, no el de sus píxeles. */
+.captura.recorte img { margin: 0 auto; }
+.captura.recorte a { width: fit-content; max-width: 100%; margin: 0 auto; }
+
+/* Barra superior */
+.barra { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--fondo) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--borde); }
+.barra .envoltura { position: relative; display: flex; align-items: center; gap: 12px; min-height: 64px; }
+.marca { display: flex; align-items: center; gap: 10px; min-height: 44px; font: 700 1.15rem var(--fuente); color: var(--texto); text-decoration: none; }
+.marca img { width: 30px; height: 30px; }
+/* En escritorio el panel del menú no existe: sus secciones y el idioma se colocan en la barra. */
+.menu-panel, .preferencias { display: contents; }
+/* ES/EN lo cambia sitio.js: sin JavaScript no haría nada y no se ve. */
+html:not(.js) .preferencias { display: none; }
+.barra nav { display: flex; gap: 20px; margin-left: auto; }
+.barra nav a, .barra .boton { white-space: nowrap; }
+.barra .github, .barra .idioma, .barra .boton { flex: none; }
+.barra nav a { color: var(--texto-suave); text-decoration: none; font-size: .95rem; padding: 10px 0; }
+.barra nav a:hover, .barra nav a[aria-current="page"] { color: var(--texto); }
+.barra nav a[aria-current="page"] { font-weight: 600; }
+/* «Descargar» ya es el botón de la barra: su entrada de la lista solo se ve dentro del menú del móvil. */
+.barra nav a.solo-menu { display: none; }
+.github { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 8px; color: var(--texto-suave); }
+.github:hover { color: var(--texto); background: var(--acento-suave); }
+.github svg { width: 22px; height: 22px; }
+/* ES/EN: control segmentado. Sin overflow: hidden, para que el foco no quede recortado. */
+.idioma { display: inline-flex; border: 1px solid var(--borde-control); border-radius: 10px; }
+.idioma button { border: 0; background: none; color: var(--texto-suave); font: 600 .8rem var(--fuente); padding: 0 10px; min-height: 44px; min-width: 44px; cursor: pointer; }
+.idioma button:first-child { border-radius: 9px 0 0 9px; }
+.idioma button:last-child { border-radius: 0 9px 9px 0; }
+.idioma button:focus-visible { position: relative; z-index: 1; }
+.idioma button[aria-pressed="true"] { background: var(--acento); color: var(--acento-texto); }
+.menu-boton { display: none; flex: none; place-items: center; width: 44px; height: 44px; margin-left: auto; border: 1px solid var(--borde-control); border-radius: 8px; background: none; color: var(--texto); cursor: pointer; }
+.menu-boton svg { width: 20px; height: 20px; }
+.barra .boton svg { display: none; }
+
+/* Botones: el paso del cursor solo cambia el borde, sin levantarse. */
+.boton { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; border: 1px solid transparent; transition: border-color .15s ease; }
+.boton:hover { border-color: var(--texto); }
+.boton.principal { background: var(--acento); color: var(--acento-texto); }
+.boton.secundario { background: var(--superficie); color: var(--texto); border: 1px dashed var(--borde-control); }
+.boton.secundario:hover { border-color: var(--acento); }
+.boton svg { width: 18px; height: 18px; flex: none; }
+
+/* Lo provisional (enlaces de descarga y de GitHub hasta la primera versión): una chapa ámbar con texto, nunca solo color.
+   Con una versión publicada (sitio.js, clase «publicado») desaparece. */
+.provisional { display: inline-block; padding: 3px 10px; border: 1px solid color-mix(in srgb, var(--ambar) 55%, transparent); border-radius: 999px; color: var(--ambar); font: 600 .72rem/1.5 var(--fuente); letter-spacing: .02em; text-transform: uppercase; vertical-align: middle; white-space: nowrap; }
+.aviso { display: flex; gap: 12px; align-items: flex-start; max-width: 46em; margin: 28px auto 0; padding: 14px 18px; text-align: left; background: color-mix(in srgb, var(--ambar) 8%, var(--superficie)); border: 1px solid color-mix(in srgb, var(--ambar) 45%, transparent); border-radius: var(--radio); font-size: .95rem; }
+.aviso svg { flex: none; width: 20px; height: 20px; margin-top: 2px; color: var(--ambar); }
+html.publicado [data-provisional] { display: none; }
+
+/* Secciones */
+section { padding: 72px 0; }
+.cabeza { max-width: 44em; margin-bottom: 36px; }
+.cabeza p { margin-top: 12px; font-size: 1.05rem; }
+#fig { padding: 16px 0 24px; }
+.junto { padding-top: 36px; }
+
+/* Producto: los tres pasos, los niveles de consecuencia, los ecosistemas y las garantías. */
+.pasos-como { list-style: none; counter-reset: paso; margin: 0 0 28px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.pasos-como li { counter-increment: paso; }
+.pasos-como li::before { content: '0' counter(paso); content: '0' counter(paso) / ''; display: block; margin-bottom: 6px; font: 500 .8rem var(--mono); color: var(--acento); }
+.pasos-como p { margin-top: 6px; color: var(--texto-suave); font-size: .95rem; }
+/* El nivel lleva su nombre escrito, como en la app: el color solo acompaña. */
+.niveles { margin: 0; display: grid; gap: 0; }
+.niveles > div { display: grid; grid-template-columns: 15em minmax(0, 1fr); gap: 8px 20px; padding: 14px 0; border-bottom: 1px dashed var(--borde); }
+.niveles > div:last-child { border-bottom: 0; }
+.niveles dt { margin: 0; }
+.niveles dd { margin: 0; color: var(--texto-suave); font-size: .95rem; }
+.nivel { display: inline-block; padding: 2px 12px; border: 1px solid var(--borde-control); border-radius: 999px; font-size: .85rem; font-weight: 600; white-space: nowrap; }
+.nivel.atencion { border-color: color-mix(in srgb, var(--ambar) 55%, transparent); color: var(--ambar); }
+.dos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: start; }
+.ecosistemas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 28px; }
+.ecosistemas li { padding: 14px 0; border-top: 1px dashed var(--borde); }
+.ecosistemas h3 { font-size: 1rem; margin-bottom: 4px; }
+.ecosistemas p { color: var(--texto-suave); font-size: .9rem; }
+.lista { margin: 12px 0 0; padding-left: 1.2em; color: var(--texto-suave); font-size: .95rem; }
+.lista li + li { margin-top: 6px; }
+
+/* Descargar: una tarjeta por paquete, con su suma SHA-256, y la orden para comprobarla. */
+.descargas .tarjeta { display: flex; flex-direction: column; gap: 14px; padding: 26px; }
+.descargas .tarjeta p + p { margin-top: 0; }
+.descargas .boton { align-self: flex-start; }
+.suma { font-size: .85rem; }
+.suma code { display: block; margin-top: 4px; padding: 8px 10px; background: var(--fondo); border: 1px solid var(--borde); border-radius: 6px; color: var(--texto); overflow-wrap: anywhere; }
+.bloque-codigo { position: relative; margin: 16px 0 0; padding: 16px 18px; overflow-x: auto; background: var(--fondo); border: 1px solid var(--borde); border-radius: 8px; font: .86rem/1.7 var(--mono); }
+.bloque-codigo:has(.copiar) { padding-top: 60px; }
+.copiar { position: absolute; top: 8px; right: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--borde-control); border-radius: 6px; background: var(--superficie); color: var(--texto); font: 600 .8rem var(--fuente); cursor: pointer; }
+.copiar:hover { border-color: var(--acento); }
+
+/* Términos de uso: texto corrido. */
+.doc { max-width: 44em; }
+.doc h2 { font-size: 1.3rem; margin: 36px 0 10px; }
+.doc p, .doc ul { color: var(--texto-suave); }
+.doc p + p { margin-top: 12px; }
+.doc ul { padding-left: 1.2em; }
+.doc li + li { margin-top: 6px; }
+
+/* Pie */
+footer { border-top: 1px solid var(--borde); padding: 28px 0 40px; font-size: .875rem; color: var(--texto-suave); }
+footer .envoltura { display: flex; flex-direction: column; gap: 10px; }
+.pie-enlaces { display: flex; flex-wrap: wrap; gap: 0 20px; }
+.pie-enlaces a { display: inline-block; min-height: 44px; padding: 11px 0; color: var(--texto-suave); }
+.pie-enlaces a:hover { color: var(--texto); }
+
+/* Pantallas medianas y pequeñas: las secciones y el idioma van al panel del menú, que abre su botón. Sin JavaScript no
+   hay botón: las secciones bajan a una segunda fila de la barra. */
+@media (max-width: 56.25em) {
+  .menu-boton:not([hidden]) { display: inline-grid; }
+  .barra nav { flex-direction: column; gap: 0; margin: 0; }
+  .barra nav a { padding: 10px 12px; border-radius: 8px; }
+  .barra nav a.solo-menu { display: block; }
+  .barra nav a:hover { background: var(--acento-suave); }
+  .preferencias { display: flex; }
+  html.js .menu-panel { display: none; position: absolute; top: 100%; right: 16px; flex-direction: column; gap: 8px; min-width: 240px; padding: 8px; background: var(--superficie); border: 1px solid var(--borde-control); border-radius: var(--radio); }
+  html.js .barra.abierta .menu-panel { display: flex; }
+  html.js .preferencias { padding: 8px 4px 4px; border-top: 1px solid var(--borde); }
+  html:not(.js) .barra { position: static; }
+  html:not(.js) .barra .envoltura { flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
+  html:not(.js) .menu-panel { display: flex; order: 5; width: 100%; }
+  html:not(.js) .barra nav { flex-direction: row; flex-wrap: wrap; gap: 0 16px; }
+  html:not(.js) .barra nav a { padding: 10px 0; }
+  html:not(.js) .github { margin-left: auto; }
+  .pasos-como { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .ecosistemas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dos { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 40em) {
+  .envoltura { padding: 0 16px; }
+  section { padding: 52px 0; }
+  .arranque { padding: 64px 0 40px; }
+  .arranque.corto { padding: 52px 0 28px; }
+  .entrada { font-size: 1.05rem; }
+  .tarjeta { padding: 16px; }
+  .barra .envoltura { gap: 8px; }
+  .github { display: none; }
+  /* Descargar queda en un botón compacto con su icono. */
+  .barra .boton { padding: 0; width: 44px; justify-content: center; }
+  .barra .boton svg { display: block; }
+  .barra .boton-texto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .niveles > div { grid-template-columns: minmax(0, 1fr); }
+  .ecosistemas { grid-template-columns: minmax(0, 1fr); }
+}

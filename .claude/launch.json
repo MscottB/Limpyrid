@@ -1,0 +1,1 @@
+{"version":"0.0.1","configurations":[{"name":"limpyrid-ui","runtimeExecutable":"npm","runtimeArgs":["run","dev"],"port":1420},{"name":"limpyrid-site","runtimeExecutable":"python","runtimeArgs":["-m","http.server","1440","--bind","127.0.0.1","--directory","site"],"port":1440}]}

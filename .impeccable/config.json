@@ -1,0 +1,56 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-11-14T22:29:12.313Z",
+        "reason": "Encargo del sitio: similar al de Tramtai, que el usuario dio como base; el encargo pide fuente Inter y titular con la segunda linea en cursiva de acento"
+      },
+      {
+        "rule": "overused-font",
+        "value": "instrument serif",
+        "createdAt": "2026-11-14T22:29:12.466Z",
+        "reason": "Encargo del sitio: similar al de Tramtai, que el usuario dio como base; el encargo pide fuente Inter y titular con la segunda linea en cursiva de acento"
+      },
+      {
+        "rule": "italic-serif-display",
+        "value": "*",
+        "files": [
+          "site/index.html"
+        ],
+        "createdAt": "2026-11-14T22:29:12.606Z",
+        "reason": "Encargo del sitio: similar al de Tramtai, que el usuario dio como base; el encargo pide fuente Inter y titular con la segunda linea en cursiva de acento"
+      },
+      {
+        "rule": "italic-serif-display",
+        "value": "*",
+        "files": [
+          "site/producto.html"
+        ],
+        "createdAt": "2026-11-14T22:29:12.748Z",
+        "reason": "Encargo del sitio: similar al de Tramtai, que el usuario dio como base; el encargo pide fuente Inter y titular con la segunda linea en cursiva de acento"
+      },
+      {
+        "rule": "italic-serif-display",
+        "value": "*",
+        "files": [
+          "site/descargar.html"
+        ],
+        "createdAt": "2026-11-14T22:29:12.901Z",
+        "reason": "Encargo del sitio: similar al de Tramtai, que el usuario dio como base; el encargo pide fuente Inter y titular con la segunda linea en cursiva de acento"
+      },
+      {
+        "rule": "italic-serif-display",
+        "value": "*",
+        "files": [
+          "site/terminos.html"
+        ],
+        "createdAt": "2026-11-14T22:29:13.036Z",
+        "reason": "Encargo del sitio: similar al de Tramtai, que el usuario dio como base; el encargo pide fuente Inter y titular con la segunda linea en cursiva de acento"
+      }
+    ]
+  }
+}

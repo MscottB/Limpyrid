@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-en="Limpyrid · Reclaim your disk without deleting blind">Limpyrid · Recupera tu disco sin borrar a ciegas</title>
+<meta name="description" content="Limpyrid es una app de escritorio para Windows que muestra qué ocupa tu disco y limpia, con cuidado, lo que dejan atrás las herramientas de desarrollo. Software libre.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Limpyrid">
+<meta property="og:title" content="Limpyrid · Recupera tu disco sin borrar a ciegas">
+<meta property="og:description" content="Una app de escritorio para Windows que muestra qué ocupa tu disco y limpia, con cuidado, lo que dejan atrás las herramientas de desarrollo.">
+<meta name="theme-color" content="#0B1220">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icono-256.png">
+<link rel="stylesheet" href="estilo.css">
+<script src="sitio.js" defer></script>
+<script>document.documentElement.classList.add('js'); try { var i = localStorage.getItem('limpyrid.sitio.idioma') } catch (e) {}
+document.documentElement.lang = i === 'es' || i === 'en' ? i : (navigator.language || 'es').slice(0, 2) === 'es' ? 'es' : 'en'</script>
+</head>
+<body>
+<!-- La cabecera y el pie son los mismos en las cuatro páginas: un cambio aquí va también en las otras tres. -->
+<a class="saltar" href="#contenido"><span lang="es">Saltar al contenido</span><span lang="en">Skip to content</span></a>
+<header class="barra">
+  <div class="envoltura">
+    <a class="marca" href="index.html"><img src="logo.svg" width="30" height="30" alt=""><span class="marca-texto">Limpyrid</span></a>
+    <button type="button" class="menu-boton" aria-expanded="false" aria-controls="menu" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span lang="es" class="solo-lectores">Menú</span><span lang="en" class="solo-lectores">Menu</span></button>
+    <div id="menu" class="menu-panel">
+      <nav aria-label="Secciones" data-aria-en="Sections">
+        <a href="producto.html"><span lang="es">Producto</span><span lang="en">Product</span></a>
+        <a href="producto.html#seguridad"><span lang="es">Seguridad</span><span lang="en">Safety</span></a>
+        <a href="terminos.html"><span lang="es">Términos</span><span lang="en">Terms</span></a>
+        <a href="descargar.html" class="solo-menu"><span lang="es">Descargar</span><span lang="en">Download</span></a>
+      </nav>
+      <div class="preferencias">
+        <div class="idioma" role="group" aria-label="Idioma" data-aria-en="Language">
+          <button type="button" data-idioma="es" aria-pressed="true">ES</button>
+          <button type="button" data-idioma="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+    <a class="github" href="https://github.com/MscottB/Limpyrid" aria-label="GitHub" data-aria-en="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg></a>
+    <a class="boton principal" href="descargar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg><span class="boton-texto"><span lang="es">Descargar</span><span lang="en">Download</span></span></a>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+  <!-- 1. Arranque: qué es, para quién y Descargar. -->
+  <section id="arranque" class="arranque">
+    <div class="envoltura">
+      <h1 class="titular"><span lang="es">Recupera tu disco,<br> <em>sin borrar a ciegas.</em></span><span lang="en">Reclaim your disk,<br> <em>without deleting blind.</em></span></h1>
+      <p class="entrada"><span lang="es">Limpyrid es una app de escritorio para Windows que muestra qué ocupa tu disco y limpia, con cuidado, lo que dejan atrás las herramientas de desarrollo: cachés de npm, pip o cargo, carpetas que se regeneran, worktrees de git, datos de Docker y temporales de agentes de IA. Para quien programa y ve cómo se le llena el disco.</span><span lang="en">Limpyrid is a Windows desktop app that shows what is using your disk and carefully cleans what developer tools leave behind: npm, pip or cargo caches, folders that rebuild themselves, git worktrees, Docker data and AI agent temp files. For developers whose disk keeps filling up.</span></p>
+      <div class="acciones">
+        <a class="boton principal" href="descargar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg><span lang="es">Descargar para Windows</span><span lang="en">Download for Windows</span></a>
+        <a class="boton secundario" href="producto.html#como"><span lang="es">Cómo funciona</span><span lang="en">How it works</span></a>
+      </div>
+      <p class="nota"><span lang="es">Windows 10 y 11 · software libre, GPL-3.0-or-later</span><span lang="en">Windows 10 and 11 · free software, GPL-3.0-or-later</span><span data-version></span><span data-provisional><span lang="es"> · en desarrollo: todavía sin versión publicada</span><span lang="en"> · in development: no released version yet</span></span></p>
+      <script type="application/json" id="descargas">{}</script>
+    </div>
+  </section>
+
+  <!-- 2. El mosaico «FIG»: capturas de la app en modo demostración (npm run dev), con sus datos de ejemplo. -->
+  <section id="fig" aria-labelledby="fig-titulo">
+    <div class="envoltura">
+      <h2 id="fig-titulo" class="solo-lectores"><span lang="es">Limpyrid en cinco figuras</span><span lang="en">Limpyrid in five figures</span></h2>
+      <div class="mosaico">
+        <figure class="tarjeta entera">
+          <figcaption class="fig"><span lang="es">FIG 1 · Qué ocupa tu disco</span><span lang="en">FIG 1 · What is using your disk</span></figcaption>
+          <div class="captura">
+            <a lang="es" href="capturas/inicio-es-2560.webp"><img src="capturas/inicio-es-1280.webp" srcset="capturas/inicio-es-1280.webp 1280w, capturas/inicio-es-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 1026px" width="1280" height="800" decoding="async" alt="Inicio de Limpyrid tras un escaneo: el disco C: con 79,2 GB libres de 510,9 GB, lo que se puede recuperar por nivel y dónde está el espacio, por herramienta"></a>
+            <a lang="en" href="capturas/inicio-en-2560.webp"><img src="capturas/inicio-en-1280.webp" srcset="capturas/inicio-en-1280.webp 1280w, capturas/inicio-en-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 1026px" width="1280" height="800" decoding="async" alt="Limpyrid Home after a scan: drive C: with 79.2 GB free of 510.9 GB, what can be recovered by level and where the space is, by tool"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Escaneas una unidad o una carpeta e Inicio dice cuánto queda libre y dónde está el espacio: por herramienta a la izquierda, por nivel de consecuencia en el centro. Escanear no borra nada.</span><span lang="en">You scan a drive or a folder and Home tells you how much is free and where the space went: by tool on the left, by consequence level in the middle. Scanning deletes nothing.</span></p>
+        </figure>
+
+        <figure class="tarjeta ancha">
+          <figcaption class="fig"><span lang="es">FIG 2 · Qué se puede recuperar</span><span lang="en">FIG 2 · What can be recovered</span></figcaption>
+          <div class="captura recorte">
+            <a lang="es" href="capturas/recuperar-es.webp"><img src="capturas/recuperar-es.webp" width="736" height="296" loading="lazy" decoding="async" alt="Se puede recuperar, en cuatro filas: se regenera solo, se vuelve a descargar, hay que recompilar y requiere tu atención, cada una con su tamaño"></a>
+            <a lang="en" href="capturas/recuperar-en.webp"><img src="capturas/recuperar-en.webp" width="736" height="296" loading="lazy" decoding="async" alt="Can be recovered, in four rows: comes back by itself, gets downloaded again, needs a rebuild and needs your attention, each with its size"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Cuatro niveles, de menor a mayor consecuencia. Los dos primeros se marcan con una casilla; lo que hay que recompilar o requiere tu atención se revisa uno a uno. En el disco de ejemplo, hasta 116,8 GB.</span><span lang="en">Four levels, from the mildest consequence to the most serious. The first two are ticked with one checkbox; what needs a rebuild or your attention is reviewed item by item. On the sample disk, up to 116.8 GB.</span></p>
+        </figure>
+
+        <figure class="tarjeta">
+          <figcaption class="fig"><span lang="es">FIG 3 · Qué pasa si lo limpio</span><span lang="en">FIG 3 · What happens if I clean it</span></figcaption>
+          <div class="captura recorte">
+            <img lang="es" src="capturas/detalle-es.webp" width="299" height="357" loading="lazy" decoding="async" alt="El detalle de la caché de npm: qué es, que se vuelve a descargar si la limpias y la carpeta donde está">
+            <img lang="en" src="capturas/detalle-en.webp" width="299" height="357" loading="lazy" decoding="async" alt="The npm cache detail: what it is, that it gets downloaded again if you clean it, and the folder where it lives">
+          </div>
+          <p class="suave fig-pie"><span lang="es">Cada fila responde qué es, qué pasa si la limpias y dónde está, antes de que marques nada.</span><span lang="en">Every row tells you what it is, what happens if you clean it and where it lives, before you tick anything.</span></p>
+        </figure>
+
+        <figure class="tarjeta">
+          <figcaption class="fig"><span lang="es">FIG 4 · Lo que no se toca</span><span lang="en">FIG 4 · What stays untouched</span></figcaption>
+          <div class="captura recorte">
+            <img lang="es" src="capturas/protegido-detalle-es.webp" width="299" height="583" loading="lazy" decoding="async" alt="El detalle de un worktree de git protegido: tiene cambios sin guardar en un commit y tuvo actividad reciente">
+            <img lang="en" src="capturas/protegido-detalle-en.webp" width="299" height="564" loading="lazy" decoding="async" alt="The detail of a protected git worktree: it has uncommitted changes and had recent activity">
+          </div>
+          <p class="suave fig-pie"><span lang="es">Un worktree con cambios sin commit, commits fuera de toda rama o uso reciente se muestra con su motivo, sin casilla. Windows, Program Files y tu carpeta de usuario están bloqueadas para cualquier acción.</span><span lang="en">A worktree with uncommitted changes, commits outside any branch or recent use is shown with its reason and no checkbox. Windows, Program Files and your user folder are blocked for every action.</span></p>
+        </figure>
+
+        <figure class="tarjeta ancha">
+          <figcaption class="fig"><span lang="es">FIG 5 · Confirmas antes de borrar</span><span lang="en">FIG 5 · You confirm before deleting</span></figcaption>
+          <div class="captura recorte">
+            <a lang="es" href="capturas/confirmar-es.webp"><img src="capturas/confirmar-es.webp" width="600" height="460" loading="lazy" decoding="async" alt="La confirmación: lista las dos cachés que se van a borrar, con su tamaño, su ruta y la etiqueta Definitivo, y avisa de que no pasan por la Papelera"></a>
+            <a lang="en" href="capturas/confirmar-en.webp"><img src="capturas/confirmar-en.webp" width="600" height="460" loading="lazy" decoding="async" alt="The confirmation: it lists the two caches about to be deleted, with their size, their path and the Permanent label, and warns that they skip the Recycle Bin"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Nada se borra sin confirmación. La lista dice cada elemento, su tamaño y su ruta, y que el borrado es definitivo. <a href="producto.html#seguridad">Todas las garantías</a></span><span lang="en">Nothing is deleted without confirmation. The list names every item, its size and its path, and says the deletion is permanent. <a href="producto.html#seguridad">Every safeguard</a></span></p>
+        </figure>
+      </div>
+      <p class="nota nota-figuras"><span lang="es">Las capturas son de la app en modo demostración, con datos de ejemplo. Lo que recuperes depende de lo que haya en tu equipo.</span><span lang="en">The screenshots come from the app in demo mode, with sample data. What you recover depends on what is on your computer.</span></p>
+    </div>
+  </section>
+
+  <!-- 3. Analizar: lo que no entra en ninguna categoría. -->
+  <section id="analizar">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Lo que no es caché, <em>también se ve.</em></span><span lang="en">What isn’t a cache <em>shows up too.</em></span></h2>
+        <p class="suave"><span lang="es">Carpetas y Mapa ordenan el disco entero por tamaño, para investigar lo que no entra en ninguna categoría. Desde ahí, lo que elijas va a la Papelera de reciclaje.</span><span lang="en">Folders and Map sort the whole disk by size, so you can look into whatever fits no category. From there, what you pick goes to the Recycle Bin.</span></p>
+      </div>
+      <div class="mosaico" style="--col: 2">
+        <figure class="tarjeta">
+          <figcaption class="fig"><span lang="es">FIG 6 · Carpetas</span><span lang="en">FIG 6 · Folders</span></figcaption>
+          <div class="captura">
+            <a lang="es" href="capturas/carpetas-es-2560.webp"><img src="capturas/carpetas-es-1280.webp" srcset="capturas/carpetas-es-1280.webp 1280w, capturas/carpetas-es-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 500px" width="1280" height="800" loading="lazy" decoding="async" alt="Carpetas: el contenido de C: de mayor a menor, con la carpeta Users elegida y su detalle"></a>
+            <a lang="en" href="capturas/carpetas-en-2560.webp"><img src="capturas/carpetas-en-1280.webp" srcset="capturas/carpetas-en-1280.webp 1280w, capturas/carpetas-en-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 500px" width="1280" height="800" loading="lazy" decoding="async" alt="Folders: the contents of C: from largest to smallest, with the Users folder picked and its detail"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Una lista, de mayor a menor, con la parte que ocupa cada carpeta.</span><span lang="en">A list, largest first, with the share each folder takes.</span></p>
+        </figure>
+        <figure class="tarjeta">
+          <figcaption class="fig"><span lang="es">FIG 7 · Mapa</span><span lang="en">FIG 7 · Map</span></figcaption>
+          <div class="captura">
+            <a lang="es" href="capturas/mapa-es-2560.webp"><img src="capturas/mapa-es-1280.webp" srcset="capturas/mapa-es-1280.webp 1280w, capturas/mapa-es-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 500px" width="1280" height="800" loading="lazy" decoding="async" alt="Mapa: la carpeta del usuario como rectángulos, cada uno en proporción a lo que ocupa"></a>
+            <a lang="en" href="capturas/mapa-en-2560.webp"><img src="capturas/mapa-en-1280.webp" srcset="capturas/mapa-en-1280.webp 1280w, capturas/mapa-en-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 500px" width="1280" height="800" loading="lazy" decoding="async" alt="Map: the user folder as rectangles, each in proportion to the space it takes"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Las mismas carpetas como rectángulos, en proporción a lo que ocupan.</span><span lang="en">The same folders as rectangles, in proportion to the space they take.</span></p>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Sigue por aquí: una tarjeta por página. -->
+  <section id="sigue" class="junto">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Sigue por aquí.</span><span lang="en">Keep going.</span></h2>
+      </div>
+      <div class="mosaico">
+        <a class="tarjeta" href="producto.html">
+          <h3><span lang="es">Producto</span><span lang="en">Product</span></h3>
+          <p><span lang="es">Cómo funciona, qué herramientas reconoce, qué se niega a tocar y qué datos salen de tu equipo.</span><span lang="en">How it works, which tools it knows, what it refuses to touch and which data leaves your computer.</span></p>
+        </a>
+        <a class="tarjeta" href="descargar.html">
+          <h3><span lang="es">Descargar</span><span lang="en">Download</span></h3>
+          <p><span lang="es">Windows: instalador y portable, con sus sumas SHA-256.</span><span lang="en">Windows: installer and portable, with their SHA-256 checksums.</span></p>
+        </a>
+        <a class="tarjeta" href="terminos.html">
+          <h3><span lang="es">Términos de uso</span><span lang="en">Terms of use</span></h3>
+          <p><span lang="es">Qué aceptas al limpiar, en lenguaje llano: el borrado es definitivo y tú decides qué se va.</span><span lang="en">What you accept when you clean, in plain language: deletion is permanent and you decide what goes.</span></p>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="envoltura">
+    <nav class="pie-enlaces" aria-label="Pie de página" data-aria-en="Footer">
+      <a href="index.html" aria-current="page"><span lang="es">Inicio</span><span lang="en">Home</span></a>
+      <a href="producto.html"><span lang="es">Producto</span><span lang="en">Product</span></a>
+      <a href="descargar.html"><span lang="es">Descargar</span><span lang="en">Download</span></a>
+      <a href="terminos.html"><span lang="es">Términos de uso</span><span lang="en">Terms of use</span></a>
+      <a href="https://www.gnu.org/licenses/gpl-3.0.html"><span lang="es">Licencia GPL-3.0-or-later</span><span lang="en">GPL-3.0-or-later license</span></a>
+      <a href="https://github.com/MscottB/Limpyrid">GitHub</a>
+    </nav>
+    <p>Copyright © 2026 Pergamio · <span lang="es">Limpyrid es software libre bajo la licencia GPL-3.0-or-later y se entrega sin garantía. npm, Docker, Claude y los demás nombres son de sus dueños; Limpyrid no está afiliada a ellos.</span><span lang="en">Limpyrid is free software under the GPL-3.0-or-later license and comes with no warranty. npm, Docker, Claude and the other names belong to their owners; Limpyrid is not affiliated with them.</span></p>
+  </div>
+</footer>
+</body>
+</html>

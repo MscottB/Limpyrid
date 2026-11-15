@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-en="Product · Limpyrid">Producto · Limpyrid</title>
+<meta name="description" content="Cómo funciona Limpyrid: escanea, marca y confirma. Qué herramientas reconoce, qué se niega a tocar y qué datos salen de tu equipo: ninguno.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Limpyrid">
+<meta property="og:title" content="Producto · Limpyrid">
+<meta property="og:description" content="Cómo funciona Limpyrid, qué herramientas reconoce, qué se niega a tocar y qué datos salen de tu equipo.">
+<meta name="theme-color" content="#0B1220">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icono-256.png">
+<link rel="stylesheet" href="estilo.css">
+<script src="sitio.js" defer></script>
+<script>document.documentElement.classList.add('js'); try { var i = localStorage.getItem('limpyrid.sitio.idioma') } catch (e) {}
+document.documentElement.lang = i === 'es' || i === 'en' ? i : (navigator.language || 'es').slice(0, 2) === 'es' ? 'es' : 'en'</script>
+</head>
+<body>
+<a class="saltar" href="#contenido"><span lang="es">Saltar al contenido</span><span lang="en">Skip to content</span></a>
+<header class="barra">
+  <div class="envoltura">
+    <a class="marca" href="index.html"><img src="logo.svg" width="30" height="30" alt=""><span class="marca-texto">Limpyrid</span></a>
+    <button type="button" class="menu-boton" aria-expanded="false" aria-controls="menu" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span lang="es" class="solo-lectores">Menú</span><span lang="en" class="solo-lectores">Menu</span></button>
+    <div id="menu" class="menu-panel">
+      <nav aria-label="Secciones" data-aria-en="Sections">
+        <a href="producto.html" aria-current="page"><span lang="es">Producto</span><span lang="en">Product</span></a>
+        <a href="producto.html#seguridad"><span lang="es">Seguridad</span><span lang="en">Safety</span></a>
+        <a href="terminos.html"><span lang="es">Términos</span><span lang="en">Terms</span></a>
+        <a href="descargar.html" class="solo-menu"><span lang="es">Descargar</span><span lang="en">Download</span></a>
+      </nav>
+      <div class="preferencias">
+        <div class="idioma" role="group" aria-label="Idioma" data-aria-en="Language">
+          <button type="button" data-idioma="es" aria-pressed="true">ES</button>
+          <button type="button" data-idioma="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+    <a class="github" href="https://github.com/MscottB/Limpyrid" aria-label="GitHub" data-aria-en="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg></a>
+    <a class="boton principal" href="descargar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg><span class="boton-texto"><span lang="es">Descargar</span><span lang="en">Download</span></span></a>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+  <section class="arranque corto">
+    <div class="envoltura">
+      <h1 class="titular"><span lang="es">Limpia lo que vuelve,<br> <em>y se niega ante la duda.</em></span><span lang="en">It cleans what comes back,<br> <em>and refuses when in doubt.</em></span></h1>
+      <p class="entrada"><span lang="es">Limpyrid borra de forma definitiva, así que está hecha para que sepas qué pasa antes de borrar y para no ofrecerte lo que podrías echar de menos.</span><span lang="en">Limpyrid deletes for good, so it is built to tell you what happens before you delete and to never offer what you might miss.</span></p>
+    </div>
+  </section>
+
+  <!-- 1. Cómo funciona: escanear, marcar y confirmar. -->
+  <section id="como" class="junto">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Cómo funciona: <em>tres pasos.</em></span><span lang="en">How it works: <em>three steps.</em></span></h2>
+      </div>
+      <ol class="pasos-como">
+        <li>
+          <h3><span lang="es">Escanea</span><span lang="en">Scan</span></h3>
+          <p><span lang="es">Eliges una unidad o una carpeta. Limpyrid mide cada carpeta y reconoce las cachés de las herramientas que conoce. Escanear no borra nada.</span><span lang="en">You pick a drive or a folder. Limpyrid sizes every folder and recognises the caches of the tools it knows. Scanning deletes nothing.</span></p>
+        </li>
+        <li>
+          <h3><span lang="es">Marca</span><span lang="en">Tick</span></h3>
+          <p><span lang="es">Por grupo, por nivel de consecuencia o fila a fila. La barra de abajo dice siempre cuánto llevas marcado y cómo quedaría el disco.</span><span lang="en">By group, by consequence level or row by row. The bar at the bottom always shows how much you have ticked and how the disk would end up.</span></p>
+        </li>
+        <li>
+          <h3><span lang="es">Confirma</span><span lang="en">Confirm</span></h3>
+          <p><span lang="es">Cada limpieza pasa por una confirmación con la lista completa. Al terminar, un informe dice qué se limpió y qué no, elemento por elemento.</span><span lang="en">Every cleanup goes through a confirmation with the full list. When it ends, a report says what was cleaned and what was not, item by item.</span></p>
+        </li>
+      </ol>
+      <div class="mosaico">
+        <figure class="tarjeta entera">
+          <figcaption class="fig"><span lang="es">FIG 1 · Un grupo, con dos cachés marcadas</span><span lang="en">FIG 1 · A group, with two caches ticked</span></figcaption>
+          <div class="captura">
+            <a lang="es" href="capturas/grupo-es-2560.webp"><img src="capturas/grupo-es-1280.webp" srcset="capturas/grupo-es-1280.webp 1280w, capturas/grupo-es-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 1026px" width="1280" height="800" decoding="async" alt="El grupo Node.js: cuatro filas con su nivel y su tamaño, las cachés de npm y pnpm marcadas, el detalle de la de npm a la derecha y, abajo, la barra con lo marcado y el botón Limpiar"></a>
+            <a lang="en" href="capturas/grupo-en-2560.webp"><img src="capturas/grupo-en-1280.webp" srcset="capturas/grupo-en-1280.webp 1280w, capturas/grupo-en-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 1026px" width="1280" height="800" decoding="async" alt="The Node.js group: four rows with their level and size, the npm and pnpm caches ticked, the npm cache detail on the right and, at the bottom, the bar with the selection and the Clean button"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Tres paneles: los grupos a la izquierda, las filas en el centro y el detalle de la fila enfocada a la derecha. Abajo, el disco de ejemplo pasaría de 79,2 GB libres a hasta 91,7 GB.</span><span lang="en">Three panes: groups on the left, rows in the middle and the detail of the focused row on the right. At the bottom, the sample disk would go from 79.2 GB free to up to 91.7 GB.</span></p>
+        </figure>
+        <figure class="tarjeta ancha">
+          <figcaption class="fig"><span lang="es">FIG 2 · Lo marcado, siempre a la vista</span><span lang="en">FIG 2 · Your selection, always in view</span></figcaption>
+          <div class="captura recorte">
+            <a lang="es" href="capturas/marcados-es.webp"><img src="capturas/marcados-es.webp" width="640" height="132" loading="lazy" decoding="async" alt="La lista de lo que se va a limpiar: la caché de npm y el almacén de pnpm, con su nivel, su tamaño y un botón para quitar cada uno"></a>
+            <a lang="en" href="capturas/marcados-en.webp"><img src="capturas/marcados-en.webp" width="640" height="132" loading="lazy" decoding="async" alt="The list of what will be cleaned: the npm cache and the pnpm store, with their level, their size and a button to remove each one"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">La lista de lo marcado se abre desde cualquier pantalla, con la consecuencia de cada entrada y un botón para quitarla.</span><span lang="en">The selection list opens from any screen, with the consequence of each entry and a button to remove it.</span></p>
+        </figure>
+        <figure class="tarjeta">
+          <figcaption class="fig"><span lang="es">FIG 3 · El aviso de uso</span><span lang="en">FIG 3 · The usage notice</span></figcaption>
+          <div class="captura recorte">
+            <a lang="es" href="capturas/terminos-es.webp"><img src="capturas/terminos-es.webp" width="600" height="611" loading="lazy" decoding="async" alt="Los términos de uso dentro de la app, con la casilla «He leído y acepto estos términos» y los botones Cancelar y Aceptar"></a>
+            <a lang="en" href="capturas/terminos-en.webp"><img src="capturas/terminos-en.webp" width="600" height="611" loading="lazy" decoding="async" alt="The terms of use inside the app, with the “I have read and accept these terms” checkbox and the Cancel and Accept buttons"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Antes de la primera acción que borra, la app muestra sus <a href="terminos.html">términos de uso</a> y pide aceptarlos.</span><span lang="en">Before the first action that deletes, the app shows its <a href="terminos.html">terms of use</a> and asks you to accept them.</span></p>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Los cuatro niveles de consecuencia, con los nombres y las frases de la app. -->
+  <section id="niveles">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Cada fila dice <em>qué te cuesta limpiarla.</em></span><span lang="en">Every row says <em>what cleaning it costs you.</em></span></h2>
+        <p class="suave"><span lang="es">Cuatro niveles de consecuencia, escritos con palabras y no solo con color.</span><span lang="en">Four consequence levels, written in words and not just in colour.</span></p>
+      </div>
+      <div class="dos">
+        <dl class="niveles">
+          <div>
+            <dt><span class="nivel"><span lang="es">Se regenera solo</span><span lang="en">Comes back by itself</span></span></dt>
+            <dd><span lang="es">La herramienta lo vuelve a crear sola cuando lo necesita. Se marca con una casilla desde Inicio.</span><span lang="en">The tool creates it again by itself when it needs it. One checkbox on Home ticks it.</span></dd>
+          </div>
+          <div>
+            <dt><span class="nivel"><span lang="es">Se vuelve a descargar</span><span lang="en">Gets downloaded again</span></span></dt>
+            <dd><span lang="es">La próxima instalación o compilación lo vuelve a descargar: necesita conexión y tarda más. También se marca con una casilla.</span><span lang="en">The next install or build downloads it again: it needs a connection and takes longer. One checkbox ticks it too.</span></dd>
+          </div>
+          <div>
+            <dt><span class="nivel"><span lang="es">Hay que recompilar</span><span lang="en">Needs a rebuild</span></span></dt>
+            <dd><span lang="es">Vuelve al recompilar o reinstalar el proyecto, y eso lleva tiempo. Se revisa proyecto a proyecto, y puedes marcar solo los inactivos desde hace 30, 90 o 180 días.</span><span lang="en">It comes back when you rebuild or reinstall the project, which takes time. You review it project by project, and you can tick only those inactive for 30, 90 or 180 days.</span></dd>
+          </div>
+          <div>
+            <dt><span class="nivel atencion"><span lang="es">Requiere tu atención</span><span lang="en">Needs your attention</span></span></dt>
+            <dd><span lang="es">Puede pedir un paso tuyo o no volver. Ninguna casilla de grupo ni de nivel lo marca: se lee qué conlleva y se marca a mano.</span><span lang="en">It may need a step from you or not come back. No group or level checkbox ticks it: you read what it means and tick it by hand.</span></dd>
+          </div>
+        </dl>
+        <figure class="tarjeta">
+          <figcaption class="fig"><span lang="es">FIG 4 · Los niveles, en la app</span><span lang="en">FIG 4 · The levels, in the app</span></figcaption>
+          <div class="captura recorte">
+            <img lang="es" src="capturas/niveles-es.webp" width="299" height="360" loading="lazy" decoding="async" alt="El panel de Inicio que explica los cuatro niveles: se regenera solo, se vuelve a descargar, hay que recompilar y requiere tu atención">
+            <img lang="en" src="capturas/niveles-en.webp" width="299" height="341" loading="lazy" decoding="async" alt="The Home pane that explains the four levels: comes back by itself, gets downloaded again, needs a rebuild and needs your attention">
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Ecosistemas: los grupos del catálogo (src-tauri/src/catalog.rs), con los nombres de la app. -->
+  <section id="ecosistemas">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Qué reconoce: <em>22 grupos de herramientas.</em></span><span lang="en">What it knows: <em>22 groups of tools.</em></span></h2>
+        <p class="suave"><span lang="es">Cada ruta del catálogo lleva anotada la fuente que la confirma. Lo que guarda datos tuyos solo se muestra: no se ofrece limpiar.</span><span lang="en">Every path in the catalogue is annotated with the source that confirms it. Whatever holds your data is only shown: cleaning it is not offered.</span></p>
+      </div>
+      <ul class="ecosistemas">
+        <li><h3><span lang="es">Sistema</span><span lang="en">System</span></h3><p><span lang="es">Los temporales de tu usuario y de Windows: solo lo que no cambió en el plazo que elijas.</span><span lang="en">Your user’s and Windows’ temp folders: only what has not changed within the age you choose.</span></p></li>
+        <li><h3>Node.js</h3><p><span lang="es">Cachés de npm, pnpm, Yarn, Bun y Deno, navegadores de Playwright, y las carpetas <code>node_modules</code>, <code>.next</code> y <code>.nuxt</code> de tus proyectos.</span><span lang="en">npm, pnpm, Yarn, Bun and Deno caches, Playwright browsers, and your projects’ <code>node_modules</code>, <code>.next</code> and <code>.nuxt</code> folders.</span></p></li>
+        <li><h3>Python</h3><p><span lang="es">Cachés de pip, uv y Poetry, entornos virtuales, <code>__pycache__</code> y <code>.pytest_cache</code>. Lo que instaló uv solo se muestra.</span><span lang="en">pip, uv and Poetry caches, virtual environments, <code>__pycache__</code> and <code>.pytest_cache</code>. What uv installed is only shown.</span></p></li>
+        <li><h3>Go</h3><p><span lang="es">La caché de compilación y la de módulos.</span><span lang="en">The build cache and the module cache.</span></p></li>
+        <li><h3>Rust</h3><p><span lang="es">El registro y las dependencias git de cargo, y las carpetas <code>target</code> de tus proyectos.</span><span lang="en">cargo’s registry and git dependencies, and your projects’ <code>target</code> folders.</span></p></li>
+        <li><h3><span lang="es">Java y Kotlin</span><span lang="en">Java and Kotlin</span></h3><p><span lang="es">Las cachés de Gradle y el repositorio local de Maven.</span><span lang="en">Gradle caches and Maven’s local repository.</span></p></li>
+        <li><h3>.NET</h3><p><span lang="es">Los paquetes y la caché HTTP de NuGet.</span><span lang="en">NuGet packages and HTTP cache.</span></p></li>
+        <li><h3>PHP</h3><p><span lang="es">La caché de Composer.</span><span lang="en">The Composer cache.</span></p></li>
+        <li><h3><span lang="es">Dart y Flutter</span><span lang="en">Dart and Flutter</span></h3><p><span lang="es">Los paquetes que descargó pub.</span><span lang="en">The packages pub downloaded.</span></p></li>
+        <li><h3><span lang="es">C y C++</span><span lang="en">C and C++</span></h3><p><span lang="es">La caché binaria de vcpkg y los paquetes de Conan 2.</span><span lang="en">vcpkg’s binary cache and Conan 2 packages.</span></p></li>
+        <li><h3>Zig</h3><p><span lang="es">La caché global de Zig.</span><span lang="en">Zig’s global cache.</span></p></li>
+        <li><h3>Terraform</h3><p><span lang="es">Las carpetas <code>.terraform</code> de tus proyectos.</span><span lang="en">Your projects’ <code>.terraform</code> folders.</span></p></li>
+        <li><h3>Git</h3><p><span lang="es">Los worktrees que ya no están en uso. La rama y sus commits se conservan.</span><span lang="en">Worktrees that are no longer in use. The branch and its commits stay.</span></p></li>
+        <li><h3><span lang="es">Pruebas web</span><span lang="en">Web testing</span></h3><p><span lang="es">Los binarios de Cypress y los navegadores de Puppeteer.</span><span lang="en">Cypress binaries and Puppeteer browsers.</span></p></li>
+        <li><h3><span lang="es">Apps de escritorio</span><span lang="en">Desktop apps</span></h3><p><span lang="es">La caché de descargas de Electron.</span><span lang="en">Electron’s download cache.</span></p></li>
+        <li><h3><span lang="es">Editores</span><span lang="en">Editors</span></h3><p><span lang="es">Las cachés de VS Code y de los IDE de JetBrains.</span><span lang="en">VS Code and JetBrains IDE caches.</span></p></li>
+        <li><h3><span lang="es">IA local</span><span lang="en">Local AI</span></h3><p><span lang="es">La caché de Hugging Face. Los modelos de Ollama solo se muestran.</span><span lang="en">The Hugging Face cache. Ollama models are only shown.</span></p></li>
+        <li><h3>Kubernetes</h3><p><span lang="es">La caché de minikube.</span><span lang="en">The minikube cache.</span></p></li>
+        <li><h3><span lang="es">Contenedores</span><span lang="en">Containers</span></h3><p><span lang="es">Docker y Podman: cuánto ocupan, limpiar lo que no se usa y compactar el disco virtual. Los volúmenes no se borran.</span><span lang="en">Docker and Podman: how much they take, cleaning what is unused and compacting the virtual disk. Volumes are not deleted.</span></p></li>
+        <li><h3><span lang="es">Agentes de IA</span><span lang="en">AI agents</span></h3><p><span lang="es">Los temporales de sesiones de Claude, por proyecto, y la caché de Antigravity. Los datos de Claude Code, Claude Desktop, Codex y Gemini solo se muestran.</span><span lang="en">Claude session temp files, per project, and the Antigravity cache. Claude Code, Claude Desktop, Codex and Gemini data is only shown.</span></p></li>
+        <li><h3>Android</h3><p><span lang="es">Los emuladores y el SDK: solo se muestran.</span><span lang="en">Emulators and the SDK: only shown.</span></p></li>
+        <li><h3>WSL</h3><p><span lang="es">Los discos virtuales de tus distribuciones: solo se muestran.</span><span lang="en">Your distributions’ virtual disks: only shown.</span></p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. Garantías de seguridad: las de «Cómo protege tus archivos» del README. -->
+  <section id="seguridad">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Lo que se niega <em>a hacer.</em></span><span lang="en">What it refuses <em>to do.</em></span></h2>
+        <p class="suave"><span lang="es">Las protecciones reducen el riesgo de borrar algo que necesitas; no lo eliminan. Por eso además se confirma siempre.</span><span lang="en">The safeguards reduce the risk of deleting something you need; they do not remove it. That is why you always confirm as well.</span></p>
+      </div>
+      <div class="mosaico">
+        <div class="tarjeta">
+          <h3><span lang="es">Aviso de uso</span><span lang="en">Usage notice</span></h3>
+          <p><span lang="es">Antes de la primera acción que borra, la app muestra sus términos y pide aceptarlos.</span><span lang="en">Before the first action that deletes, the app shows its terms and asks you to accept them.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Confirmación, siempre</span><span lang="en">Confirmation, always</span></h3>
+          <p><span lang="es">Cada limpieza lista antes cada elemento, su tamaño y su ruta. Ningún atajo de teclado limpia ni confirma.</span><span lang="en">Every cleanup first lists each item, its size and its path. No keyboard shortcut cleans or confirms.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Nada sin marcarlo</span><span lang="en">Nothing unticked</span></h3>
+          <p><span lang="es">Solo se limpia lo que tú marcas. Las casillas de grupo y de nivel dejan fuera lo que requiere tu atención, los worktrees y Docker.</span><span lang="en">Only what you tick is cleaned. Group and level checkboxes leave out what needs your attention, worktrees and Docker.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Antigüedad mínima</span><span lang="en">Minimum age</span></h3>
+          <p><span lang="es">En las carpetas temporales solo se quita lo que no cambió en el plazo que elijas: de 1 a 30 días, nunca menos de 24 horas.</span><span lang="en">In temp folders, only what has not changed within the age you choose is removed: 1 to 30 days, never less than 24 hours.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Zonas bloqueadas</span><span lang="en">Blocked areas</span></h3>
+          <p><span lang="es">Las raíces de unidad, <code>Windows</code>, <code>Program Files</code>, <code>ProgramData</code>, tu carpeta de usuario y <code>AppData</code> no se pueden borrar desde ninguna acción. El bloqueo vive en el backend y cubre también rutas de red.</span><span lang="en">Drive roots, <code>Windows</code>, <code>Program Files</code>, <code>ProgramData</code>, your user folder and <code>AppData</code> cannot be deleted by any action. The block lives in the backend and covers network paths too.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Worktrees en uso</span><span lang="en">Worktrees in use</span></h3>
+          <p><span lang="es">No se ofrece un worktree con cambios sin guardar, commits fuera de toda rama, actividad reciente o archivos ignorados que no volverían, como un <code>.env</code>. Se quitan con <code>git worktree remove</code>, sin forzar.</span><span lang="en">A worktree with unsaved changes, commits outside any branch, recent activity or ignored files that would not come back, such as a <code>.env</code>, is not offered. They are removed with <code>git worktree remove</code>, never forced.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Solo lo que se regenera</span><span lang="en">Only what comes back</span></h3>
+          <p><span lang="es">Lo que contiene datos tuyos se muestra y no se ofrece limpiar: modelos, discos de WSL, historial de conversaciones, datos de aplicaciones.</span><span lang="en">Whatever holds your data is shown and not offered for cleaning: models, WSL disks, conversation history, app data.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Enlaces</span><span lang="en">Links</span></h3>
+          <p><span lang="es">No se siguen enlaces simbólicos ni junctions: se quita el enlace, nunca su destino.</span><span lang="en">Symbolic links and junctions are not followed: the link is removed, never its target.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Se vuelve a comprobar</span><span lang="en">Checked again</span></h3>
+          <p><span lang="es">Lo que pide la interfaz no se da por bueno: el backend vuelve a calcular qué se puede borrar en el momento de hacerlo.</span><span lang="en">What the interface asks for is not taken on trust: the backend works out again what may be deleted at the moment of doing it.</span></p>
+        </div>
+        <figure class="tarjeta entera">
+          <figcaption class="fig"><span lang="es">FIG 5 · Worktrees: los protegidos, con su motivo</span><span lang="en">FIG 5 · Worktrees: the protected ones, with their reason</span></figcaption>
+          <div class="captura">
+            <a lang="es" href="capturas/protegido-es-2560.webp"><img src="capturas/protegido-es-1280.webp" srcset="capturas/protegido-es-1280.webp 1280w, capturas/protegido-es-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 1026px" width="1280" height="800" loading="lazy" decoding="async" alt="El grupo Git: ocho worktrees por repositorio; tres con casilla y cinco protegidos, cada uno con su motivo: actividad reciente, archivos ignorados, cambios sin commit, commits sin rama y bloqueado en git"></a>
+            <a lang="en" href="capturas/protegido-en-2560.webp"><img src="capturas/protegido-en-1280.webp" srcset="capturas/protegido-en-1280.webp 1280w, capturas/protegido-en-2560.webp 2560w" sizes="(max-width: 45em) calc(100vw - 66px), 1026px" width="1280" height="800" loading="lazy" decoding="async" alt="The Git group: eight worktrees by repository; three with a checkbox and five protected, each with its reason: recent activity, ignored files, uncommitted changes, commits on no branch and locked in git"></a>
+          </div>
+          <p class="suave fig-pie"><span lang="es">Lo protegido no lleva casilla: en su lugar va el motivo, y el detalle los lista todos. En el ejemplo, hasta 4,4 GB limpiables de 11,5 GB en worktrees.</span><span lang="en">Protected rows have no checkbox: the reason takes its place, and the detail lists them all. In the sample, up to 4.4 GB cleanable out of 11.5 GB in worktrees.</span></p>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Privacidad: qué datos salen del equipo. -->
+  <section id="privacidad">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Qué datos salen de tu equipo: <em>ninguno.</em></span><span lang="en">Which data leaves your computer: <em>none.</em></span></h2>
+      </div>
+      <div class="mosaico">
+        <div class="tarjeta">
+          <h3><span lang="es">Todo ocurre en tu equipo</span><span lang="en">Everything happens on your computer</span></h3>
+          <p><span lang="es">Limpyrid no envía datos a ningún servidor: ni lo que escanea, ni lo que limpia, ni cómo la usas.</span><span lang="en">Limpyrid sends no data to any server: not what it scans, not what it cleans, not how you use it.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Sin permisos de administrador</span><span lang="en">No administrator rights</span></h3>
+          <p><span lang="es">La app corre con tu usuario. Solo compactar un disco virtual los necesita, y los pide en ese momento.</span><span lang="en">The app runs as your user. Only compacting a virtual disk needs them, and it asks at that moment.</span></p>
+        </div>
+        <div class="tarjeta">
+          <h3><span lang="es">Código abierto</span><span lang="en">Open source</span></h3>
+          <p><span lang="es">Es software libre bajo la licencia GPL-3.0-or-later: lo que hace se puede leer en el código, incluido el catálogo de rutas.</span><span lang="en">It is free software under the GPL-3.0-or-later license: what it does can be read in the code, including the path catalogue.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Lo que conviene saber antes de usarla, sin adornos. -->
+  <section id="antes">
+    <div class="envoltura">
+      <div class="cabeza">
+        <h2><span lang="es">Antes de usarla, <em>lo que debes saber.</em></span><span lang="en">Before you use it, <em>what you should know.</em></span></h2>
+        <ul class="lista">
+          <li><span lang="es">Limpiar es definitivo: lo borrado no pasa por la Papelera de reciclaje. Solo «Enviar a la Papelera», en Carpetas y Mapa, la usa.</span><span lang="en">Cleaning is permanent: what is deleted skips the Recycle Bin. Only “Send to the Recycle Bin”, in Folders and Map, uses it.</span></li>
+          <li><span lang="es">Está en desarrollo. La app pasa sus pruebas, pero la limpieza todavía no se ha verificado sobre un disco real: no la uses aún sobre datos que te importen.</span><span lang="en">It is in development. The app passes its tests, but cleaning has not yet been verified on a real disk: do not use it yet on data you care about.</span></li>
+          <li><span lang="es">Hoy funciona solo en Windows 10 y 11.</span><span lang="en">Today it runs on Windows 10 and 11 only.</span></li>
+          <li><span lang="es">Mantén copias de seguridad de lo que te importa: ninguna herramienta de limpieza sustituye a un respaldo.</span><span lang="en">Keep backups of what you care about: no cleaning tool replaces a backup.</span></li>
+        </ul>
+      </div>
+      <div class="acciones" style="justify-content: flex-start; margin-top: 0">
+        <a class="boton principal" href="descargar.html"><span lang="es">Descargar para Windows</span><span lang="en">Download for Windows</span></a>
+        <a class="boton secundario" href="terminos.html"><span lang="es">Términos de uso</span><span lang="en">Terms of use</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="envoltura">
+    <nav class="pie-enlaces" aria-label="Pie de página" data-aria-en="Footer">
+      <a href="index.html"><span lang="es">Inicio</span><span lang="en">Home</span></a>
+      <a href="producto.html" aria-current="page"><span lang="es">Producto</span><span lang="en">Product</span></a>
+      <a href="descargar.html"><span lang="es">Descargar</span><span lang="en">Download</span></a>
+      <a href="terminos.html"><span lang="es">Términos de uso</span><span lang="en">Terms of use</span></a>
+      <a href="https://www.gnu.org/licenses/gpl-3.0.html"><span lang="es">Licencia GPL-3.0-or-later</span><span lang="en">GPL-3.0-or-later license</span></a>
+      <a href="https://github.com/MscottB/Limpyrid">GitHub</a>
+    </nav>
+    <p>Copyright © 2026 Pergamio · <span lang="es">Limpyrid es software libre bajo la licencia GPL-3.0-or-later y se entrega sin garantía. npm, Docker, Claude y los demás nombres son de sus dueños; Limpyrid no está afiliada a ellos.</span><span lang="en">Limpyrid is free software under the GPL-3.0-or-later license and comes with no warranty. npm, Docker, Claude and the other names belong to their owners; Limpyrid is not affiliated with them.</span></p>
+  </div>
+</footer>
+</body>
+</html>
