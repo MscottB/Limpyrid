@@ -6,6 +6,7 @@ import { getVersion } from '@tauri-apps/api/app';
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { check, type Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { updateErrCode } from './update';
 import { version } from '../../package.json';
 
 // Modo de demostracion: solo con el servidor de desarrollo (vite dev) y fuera de Tauri; dentro de la app existe
@@ -86,21 +87,32 @@ export interface UpdateInfo { version: string; current: string; date: string | n
 let pending: Update | null = null; // lo que encontro la ultima comprobacion: es lo que instala installUpdate
 export async function checkUpdate(): Promise<UpdateInfo | null> {
   if (demo) return call<UpdateInfo | null>('check_update');
-  pending = await check();
+  void pending?.close().catch(() => {}); // libera el recurso de Rust de la comprobacion anterior
+  pending = null;
+  try {
+    pending = await check({ timeout: 15_000 });
+  } catch {
+    throw updateErrCode('check');
+  }
   return pending && { version: pending.version, current: pending.currentVersion, date: pending.date ?? null, notes: pending.body ?? '' };
 }
 // Descarga, verifica la firma, instala (la app se cierra) y reinicia.
 export async function installUpdate(onProgress: (done: number, total: number | null) => void): Promise<void> {
   if (demo) return demo.demoInstallUpdate(onProgress);
-  if (!pending) throw 'command_failed';
+  if (!pending) throw updateErrCode('install');
   let done = 0;
   let total: number | null = null;
-  await pending.downloadAndInstall((e) => {
-    if (e.event === 'Started') total = e.data.contentLength ?? null;
-    else if (e.event === 'Progress') done += e.data.chunkLength;
-    onProgress(done, total);
-  });
-  await relaunch();
+  try {
+    // Limite de la peticion entera; sin el, la descarga hereda los 15 s de la comprobacion.
+    await pending.downloadAndInstall((e) => {
+      if (e.event === 'Started') total = e.data.contentLength ?? null;
+      else if (e.event === 'Progress') done += e.data.chunkLength;
+      onProgress(done, total);
+    }, { timeout: 300_000 });
+    await relaunch();
+  } catch {
+    throw updateErrCode('install');
+  }
 }
 export const openDownloads = () => (isDemo ? Promise.resolve() : openUrl('https://mscottb.github.io/Limpyrid/descargar.html'));
 

@@ -33,7 +33,7 @@ const ECOSYSTEMS = [
   'system', 'node', 'python', 'go', 'rust', 'java', 'dotnet', 'php', 'dart', 'cpp', 'zig', 'terraform',
   'web-testing', 'native-build', 'editors', 'local-ai', 'android', 'kubernetes', 'containers', 'wsl', 'ai-agents', 'git',
 ];
-const ERROR_CODES = ['no_scan', 'scan_running', 'busy', 'blocked', 'unknown_category', 'engine_missing', 'engine_stopped', 'engine_remote', 'uac_denied', 'command_failed'];
+const ERROR_CODES = ['no_scan', 'scan_running', 'busy', 'blocked', 'unknown_category', 'engine_missing', 'engine_stopped', 'engine_remote', 'uac_denied', 'command_failed', 'update_check_failed', 'update_install_failed'];
 const SKIP_REASONS = ['in_use', 'denied', 'blocked', 'too_recent', 'too_large', 'other']; // SkipReason en clean.rs (snake_case)
 // Protection y WorktreeKind en worktrees.rs (snake_case): mantener sincronizado con esa fuente.
 const PROTECTIONS = ['uncommitted', 'unreachable', 'recent', 'locked', 'ignored', 'unknown'];
@@ -797,7 +797,11 @@ assert.equal(U.canInstall({ ...av, portable: true }, false), false);
 assert.equal(U.autoCheckEnabled(null), true);
 assert.equal(U.autoCheckEnabled('0'), false);
 assert.equal(U.autoCheckEnabled('1'), true);
+// Los fallos del complemento llegan como texto en ingles: api.ts los cambia por un codigo traducible.
+assert.deepEqual([U.updateErrCode('check'), U.updateErrCode('install')], ['update_check_failed', 'update_install_failed']);
+for (const k of ['check', 'install']) assert.ok(`err.${U.updateErrCode(k)}` in es && `err.${U.updateErrCode(k)}` in en, `err.${U.updateErrCode(k)} en los dos idiomas`);
 assert.match(readFileSync(new URL('../src/lib/state.svelte.ts', import.meta.url), 'utf8'), /locked = \(\) =>[^\n]*work\.updating/, 'locked incluye work.updating');
-assert.deepEqual(srcFiles.filter((f) => readFileSync(new URL(f, srcDir), 'utf8').includes('@tauri-apps/plugin-updater')), ['lib/api.ts'], 'el complemento de actualizacion solo se importa en api.ts');
+for (const mod of ['@tauri-apps/plugin-updater', '@tauri-apps/plugin-process'])
+  assert.deepEqual(srcFiles.filter((f) => readFileSync(new URL(f, srcDir), 'utf8').includes(mod)), ['lib/api.ts'], `${mod} solo se importa en api.ts`);
 
 console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);

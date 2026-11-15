@@ -175,6 +175,8 @@
   "err.engine_remote": "Docker apunta a un motor remoto (DOCKER_HOST o el contexto de Docker). Limpyrid solo limpia el motor local de este equipo.",
   "err.uac_denied": "Windows no recibió el permiso de administrador.",
   "err.command_failed": "La operación falló. Inténtalo de nuevo.",
+  "err.update_check_failed": "No se pudo comprobar si hay una versión nueva. Revisa tu conexión.",
+  "err.update_install_failed": "No se pudo descargar o instalar la actualización.",
   "err.compactStopped": "El motor de contenedores y WSL pueden haber quedado detenidos; puedes volver a abrirlos.",
   "node.small": "Elementos pequeños (agrupados)",
   "view.noScan": "Todavía no hay datos de ninguna carpeta. Escanea una para verla aquí.",

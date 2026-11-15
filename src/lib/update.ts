@@ -16,3 +16,6 @@ export const afterCheckError = (s: UpdateState, code: string, manual: boolean): 
   manual ? { ...s, phase: 'error', error: code } : { ...s, phase: 'idle', error: null };
 
 export const autoCheckEnabled = (stored: string | null) => stored !== '0';
+
+// El complemento rechaza con texto en ingles, no con un codigo: api.ts lo cambia por uno de estos (err.* en los JSON).
+export const updateErrCode = (kind: 'check' | 'install') => (kind === 'check' ? 'update_check_failed' : 'update_install_failed');

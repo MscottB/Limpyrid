@@ -175,6 +175,8 @@
   "err.engine_remote": "Docker points to a remote engine (DOCKER_HOST or the Docker context). Limpyrid only cleans this computer's local engine.",
   "err.uac_denied": "Windows did not receive administrator permission.",
   "err.command_failed": "The operation failed. Try again.",
+  "err.update_check_failed": "Could not check for a new version. Check your connection.",
+  "err.update_install_failed": "Could not download or install the update.",
   "err.compactStopped": "The container engine and WSL may have been left stopped; you can open them again.",
   "node.small": "Small items (grouped)",
   "view.noScan": "There is no data for any folder yet. Scan one to see it here.",
