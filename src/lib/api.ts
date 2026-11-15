@@ -3,7 +3,9 @@
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { getVersion } from '@tauri-apps/api/app';
-import { revealItemInDir } from '@tauri-apps/plugin-opener';
+import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener';
+import { check, type Update } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
 import { version } from '../../package.json';
 
 // Modo de demostracion: solo con el servidor de desarrollo (vite dev) y fuera de Tauri; dentro de la app existe
@@ -78,6 +80,29 @@ export const drives = () => call<Drive[]>('drives');
 export const isPortable = () => call<boolean>('is_portable');
 export const appVersion = () => (isDemo ? Promise.resolve(version) : getVersion());
 export const reveal = (path: string) => (isDemo ? Promise.resolve() : revealItemInDir(path));
+
+// Actualizacion (complemento updater): la unica conexion de red de la app.
+export interface UpdateInfo { version: string; current: string; date: string | null; notes: string }
+let pending: Update | null = null; // lo que encontro la ultima comprobacion: es lo que instala installUpdate
+export async function checkUpdate(): Promise<UpdateInfo | null> {
+  if (demo) return call<UpdateInfo | null>('check_update');
+  pending = await check();
+  return pending && { version: pending.version, current: pending.currentVersion, date: pending.date ?? null, notes: pending.body ?? '' };
+}
+// Descarga, verifica la firma, instala (la app se cierra) y reinicia.
+export async function installUpdate(onProgress: (done: number, total: number | null) => void): Promise<void> {
+  if (demo) return demo.demoInstallUpdate(onProgress);
+  if (!pending) throw 'command_failed';
+  let done = 0;
+  let total: number | null = null;
+  await pending.downloadAndInstall((e) => {
+    if (e.event === 'Started') total = e.data.contentLength ?? null;
+    else if (e.event === 'Progress') done += e.data.chunkLength;
+    onProgress(done, total);
+  });
+  await relaunch();
+}
+export const openDownloads = () => (isDemo ? Promise.resolve() : openUrl('https://mscottb.github.io/Limpyrid/descargar.html'));
 
 export const onScanProgress = (cb: (p: Progress) => void) => on<Progress>('scan-progress', cb);
 export const onScanDone = (cb: (d: ScanDone) => void) => on<ScanDone>('scan-done', cb);

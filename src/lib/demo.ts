@@ -294,6 +294,16 @@ function applyClean(id: string, items: string[], rep: Report) {
 }
 const sizeOf = (paths: string[]) => paths.reduce((a, p) => a + find(p).size, 0);
 
+// Descarga simulada de 20 MB en 2 s; no instala ni reinicia nada.
+export async function demoInstallUpdate(onProgress: (done: number, total: number | null) => void) {
+  const total = 20 * 1048576;
+  for (let done = 0; done < total; ) {
+    await later(null, 100);
+    done += total / 20;
+    onProgress(done, total);
+  }
+}
+
 // Mismos nombres de comando y argumentos que invoke() en api.ts.
 export function demoInvoke<T>(cmd: string, args: Record<string, unknown> = {}): Promise<T> {
   const a = args as Record<string, never>;
@@ -301,6 +311,7 @@ export function demoInvoke<T>(cmd: string, args: Record<string, unknown> = {}): 
     switch (cmd) {
       case 'drives': return later(DRIVES);
       case 'is_portable': return later(false);
+      case 'check_update': return later({ version: '0.2.0', current: '0.1.0', date: '2026-12-01T00:00:00Z', notes: 'Notas de ejemplo de la version 0.2.0.' }, 600);
       case 'start_scan': return startScan();
       case 'cancel_scan': finishScan(true); return Promise.resolve();
       case 'denied_paths': return later(DENIED);

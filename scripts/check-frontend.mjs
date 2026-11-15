@@ -776,4 +776,28 @@ for (const lock of [() => (gs.work.busy = true), () => (gs.app.scan.status = 'ru
 // La limpieza de restos del actualizador no puede borrar de forma recursiva.
 assert.ok(!readFileSync(new URL('../src-tauri/src/updates.rs', import.meta.url), 'utf8').includes('remove_dir_all'), 'updates.rs sin remove_dir_all');
 
+// Actualizacion: estados de update.ts.
+const U = await import('../src/lib/update.ts');
+const base = { phase: 'idle', info: null, error: null, dismissed: false, portable: false, done: 0, total: null };
+const info = { version: '0.2.0', current: '0.1.0', date: '2026-12-01', notes: 'Notas' };
+assert.equal(U.afterCheck(base, info, false).phase, 'available');
+assert.equal(U.afterCheck(base, null, false).phase, 'idle', 'automatica sin novedad: no dice nada');
+assert.equal(U.afterCheck(base, null, true).phase, 'current', 'manual sin novedad: estas al dia');
+assert.equal(U.afterCheckError(base, 'command_failed', false).phase, 'idle', 'automatica con error: silencio');
+const err = U.afterCheckError(base, 'command_failed', true);
+assert.deepEqual([err.phase, err.error], ['error', 'command_failed']);
+const av = U.afterCheck(base, info, false);
+assert.equal(U.showNotice(av), true);
+assert.equal(U.showNotice({ ...av, dismissed: true }), false, 'Mas tarde oculta el aviso');
+assert.equal(U.mainAction(av), 'install');
+assert.equal(U.mainAction({ ...av, portable: true }), 'open-page');
+assert.equal(U.canInstall(av, false), true);
+assert.equal(U.canInstall(av, true), false, 'con escaneo o limpieza en curso no se actualiza');
+assert.equal(U.canInstall({ ...av, portable: true }, false), false);
+assert.equal(U.autoCheckEnabled(null), true);
+assert.equal(U.autoCheckEnabled('0'), false);
+assert.equal(U.autoCheckEnabled('1'), true);
+assert.match(readFileSync(new URL('../src/lib/state.svelte.ts', import.meta.url), 'utf8'), /locked = \(\) =>[^\n]*work\.updating/, 'locked incluye work.updating');
+assert.deepEqual(srcFiles.filter((f) => readFileSync(new URL(f, srcDir), 'utf8').includes('@tauri-apps/plugin-updater')), ['lib/api.ts'], 'el complemento de actualizacion solo se importa en api.ts');
+
 console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);

@@ -55,6 +55,7 @@ export const dataRev = $state({ n: 0 });
 // volver y las categorias no se vuelven a medir. `rev`: el dataRev.n con el que se cargaron.
 export const work = $state({
   busy: false,
+  updating: false, // descargando e instalando una actualizacion (update.svelte.ts): bloquea como una limpieza
   outcome: null as Outcome | null,
   cats: null as CategoryInfo[] | null,
   catsLoading: false,
@@ -73,7 +74,7 @@ export const work = $state({
 });
 
 // Limpiando o escaneando no se marca ni se borra nada: una sola regla para la puerta (guard) y para los controles.
-export const locked = () => work.busy || app.scan.status === 'running';
+export const locked = () => work.busy || work.updating || app.scan.status === 'running';
 
 export interface CleanRun { index: number; total: number; id: string; freed: number; deleted: number; expected: number; startedAt: number; ids: string[] }
 export interface Cleaned { freed: number; deleted: number; skipped: number; before: number; kind: CategoryKind; ecosystem: string; paths: string[] }

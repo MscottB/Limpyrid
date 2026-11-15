@@ -20,6 +20,15 @@
   import ConfirmDialog, { type ConfirmRequest } from './lib/ConfirmDialog.svelte';
   import ActionBar from './lib/ActionBar.svelte';
   import { confirm, resolveConfirm } from './lib/guard.svelte';
+  import { autoCheck, checkNow } from './lib/update.svelte';
+
+  // Una sola comprobacion de version por apertura, cuando la interfaz ya esta lista; la opcion se lee al vencer el plazo.
+  $effect(() => {
+    const id = setTimeout(() => {
+      if (autoCheck.on) void checkNow(false);
+    }, 5000);
+    return () => clearTimeout(id);
+  });
 
   let scanError = $state<string | null>(null);
   let cancelled = $state(false);
