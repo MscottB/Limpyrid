@@ -26,7 +26,8 @@
   "bundle": {
     "active": true,
     "copyright": "Copyright © 2026 Pergamio",
-    "targets": "all",
+    "targets": ["nsis"],
+    "licenseFile": "windows/licencia.txt",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -34,7 +35,17 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "nsis": {
+        "languages": ["Spanish", "English"],
+        "displayLanguageSelector": true,
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "headerImage": "windows/cabecera.bmp",
+        "sidebarImage": "windows/lateral.bmp"
+      }
+    }
   },
   "plugins": {
     "updater": {

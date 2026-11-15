@@ -1,5 +1,5 @@
 // Comprobaciones del frontend sin navegador: claves de i18n y formato. Uso: npm test
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { registerHooks } from 'node:module';
 import { formatBytes, formatAge, formatShare } from '../src/lib/format.ts';
@@ -814,4 +814,15 @@ for (const [name, d] of [['es', es], ['en', en]]) assert.deepEqual(UPDATE_KEYS.f
 assert.match(es['about.doesNot.1'], /GitHub/);
 assert.match(en['about.doesNot.1'], /GitHub/);
 
-console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);
+// Instalador: un solo NSIS, firma del actualizador y los archivos que cita la configuracion existen.
+const conf = JSON.parse(readFileSync(new URL('../src-tauri/tauri.conf.json', import.meta.url), 'utf8'));
+assert.deepEqual(conf.bundle.targets, ['nsis']);
+assert.equal(conf.bundle.createUpdaterArtifacts, true);
+assert.equal(conf.plugins.updater.endpoints[0], 'https://github.com/MscottB/Limpyrid/releases/latest/download/latest.json');
+const nsis = conf.bundle.windows.nsis;
+for (const f of [conf.bundle.licenseFile, nsis.installerIcon, nsis.uninstallerIcon, nsis.headerImage, nsis.sidebarImage])
+  assert.ok(existsSync(new URL(`../src-tauri/${f}`, import.meta.url)), `${f} existe`);
+assert.deepEqual(nsis.languages, ['Spanish', 'English']);
+assert.equal(nsis.displayLanguageSelector, true);
+
+console.log(`check-frontend:${Object.keys(es).length} claves, todo en orden`);
