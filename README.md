@@ -36,7 +36,7 @@ Reconoce npm, pnpm, Yarn, Bun, pip, uv, Poetry, Go, Cargo, Gradle, Maven, NuGet,
 - **Las carpetas del sistema están bloqueadas** en el backend, no solo en la interfaz.
 - **Solo lo que se regenera:** lo que contiene datos tuyos se muestra, pero no se ofrece limpiar.
 - **Worktrees en uso** (cambios sin commit, actividad reciente) nunca se ofrecen.
-- **No envía datos de tu equipo.** Su única conexión es la consulta de versión a GitHub, que se puede apagar en Acerca de, y solo pide permisos de administrador para compactar un disco virtual.
+- **No envía datos de tu equipo.** Solo se conecta a GitHub para consultar si hay una versión nueva (se puede apagar en Acerca de) y para descargar la actualización si la aceptas. Solo pide permisos de administrador para compactar un disco virtual.
 
 El detalle está en la página [Producto](https://mscottb.github.io/Limpyrid/producto.html).
 
@@ -64,6 +64,6 @@ Copyright © 2026 Pergamio. Software libre bajo `GPL-3.0-or-later` ([LICENSE](LI
 
 **Limpyrid is a Windows desktop app that shows what is using your disk and carefully cleans what developer tools leave behind:** package caches, folders that can be rebuilt, git worktrees, Docker data and temporary files from AI agents. Before anything is deleted, it tells you what each item is and what happens if you clean it.
 
-Nothing is deleted without a confirmation that lists every item, system folders are blocked in the backend, and it sends no data from your computer: its only connection is a version check with GitHub, which you can turn off. Version 0.1.0 is in preparation: there is no published installer yet, so for now you build it from source with `npm install` and `npm run tauri dev`.
+Nothing is deleted without a confirmation that lists every item, system folders are blocked in the backend, and it sends no data from your computer: it only connects to GitHub to check for a new version, which you can turn off, and to download an update you accept. Version 0.1.0 is in preparation: there is no published installer yet, so for now you build it from source with `npm install` and `npm run tauri dev`.
 
 [Site](https://mscottb.github.io/Limpyrid/) · Free software under `GPL-3.0-or-later`, provided as is, with no warranty. Copyright © 2026 Pergamio.

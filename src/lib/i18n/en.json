@@ -34,7 +34,7 @@
   "about.protects.3": "Worktrees with uncommitted changes, commits outside any branch or recent activity are shown but cannot be removed.",
   "about.protects.4": "In temporary folders, only what has not changed within the minimum age you choose is deleted.",
   "about.doesNotTitle": "What it does not do",
-  "about.doesNot.1": "It sends no data from your computer. Its only connection is the version check with GitHub, which you can turn off with “Check for updates on startup”.",
+  "about.doesNot.1": "It sends no data from your computer. It only connects to GitHub to check for a new version, which you can turn off with “Check for updates on startup”, and to download the update if you accept it.",
   "about.doesNot.2": "It does not delete your models, WSL disks or app data: those categories are for information only.",
   "about.doesNot.3": "It does not follow symbolic links when deleting: it removes the link, never its target.",
   "about.license": "License",
@@ -490,5 +490,5 @@
   "update.checking": "Checking…",
   "update.upToDate": "You are up to date.",
   "update.auto": "Check for updates on startup",
-  "update.privacy": "It is Limpyrid’s only network connection: it asks GitHub for the latest version number and sends no data from your computer."
+  "update.privacy": "This is the only reason Limpyrid goes online: it asks GitHub for the latest version number and, if you accept it, downloads the update. It sends no data from your computer; as with any connection, GitHub sees your IP address."
 }

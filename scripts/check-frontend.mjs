@@ -813,6 +813,10 @@ for (const [name, d] of [['es', es], ['en', en]]) assert.deepEqual(UPDATE_KEYS.f
 // La lista "no hace" ya no dice que no hay ninguna conexion: nombra la consulta de version.
 assert.match(es['about.doesNot.1'], /GitHub/);
 assert.match(en['about.doesNot.1'], /GitHub/);
+// Privacidad (Ruling A-6): consulta y descarga de la actualizacion, y GitHub ve la IP; nada de "unica conexion".
+assert.match(es['update.privacy'], /dirección IP/);
+assert.match(en['update.privacy'], /IP address/);
+for (const d of [es, en]) for (const k of ['about.doesNot.1', 'update.privacy']) assert.doesNotMatch(d[k], /única conexión|only connection/i, k);
 
 // Instalador: un solo NSIS, firma del actualizador y los archivos que cita la configuracion existen.
 const conf = JSON.parse(readFileSync(new URL('../src-tauri/tauri.conf.json', import.meta.url), 'utf8'));

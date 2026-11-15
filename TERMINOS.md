@@ -44,9 +44,10 @@ limpia.
 
 ## Privacidad
 
-Limpyrid no envía datos de tu equipo. Todo ocurre en él. Su única conexión de red es la
-consulta de versión a GitHub: pide el número de la última versión, sin enviar nada de tu
-equipo, y se puede apagar en Acerca de con «Buscar actualizaciones al abrir».
+Limpyrid no envía datos de tu equipo. Todo ocurre en él. Solo se conecta a GitHub para
+consultar si hay una versión nueva, lo que se puede apagar en Acerca de con «Buscar
+actualizaciones al abrir», y para descargar la actualización si la aceptas. Como en
+cualquier conexión, GitHub ve tu dirección IP.
 
 ---
 
@@ -65,5 +66,6 @@ including loss of data, unsaved work, time or income, or other programs misbehav
 a cleanup. See sections 15 and 16 of the license.
 
 Limpyrid is not affiliated with the makers of the tools whose caches it cleans, and it
-sends no data from your computer. Its only network connection is a version check with
-GitHub, which you can turn off in About with "Check for updates on startup".
+sends no data from your computer. It only connects to GitHub to check for a new version,
+which you can turn off in About with "Check for updates on startup", and to download the
+update if you accept it. As with any connection, GitHub sees your IP address.
