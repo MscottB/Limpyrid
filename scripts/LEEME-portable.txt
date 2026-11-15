@@ -1,0 +1,41 @@
+LIMPYRID - VERSION PORTABLE
+
+Que es
+  Limpyrid analiza que ocupa el disco y limpia caches y temporales del usuario.
+  Esta version no se instala: descomprime la carpeta donde quieras y abre Limpyrid.exe.
+
+Requisitos
+  Necesita WebView2, que ya viene incluido en Windows 10 y Windows 11.
+
+Tus datos
+  "Portable" significa sin instalacion. Las preferencias (idioma, antiguedad minima,
+  aceptacion del aviso de uso) se guardan en tu perfil de usuario, igual que en la
+  version instalada, no junto al programa.
+
+Actualizar
+  Limpyrid te avisa cuando hay una version nueva, con un enlace a la pagina de descarga.
+  No se reemplaza solo: descarga el zip nuevo y sustituye esta carpeta.
+
+Licencia y terminos: LICENSE y TERMINOS.md.
+
+------------------------------------------------------------------------
+
+LIMPYRID - PORTABLE VERSION
+
+What it is
+  Limpyrid shows what is using your disk and cleans user caches and temporary files.
+  This version needs no installation: unzip the folder anywhere and open Limpyrid.exe.
+
+Requirements
+  It needs WebView2, which is already included in Windows 10 and Windows 11.
+
+Your data
+  "Portable" means no installation. Your preferences (language, minimum age,
+  acceptance of the usage notice) are stored in your user profile, just like the
+  installed version, not next to the program.
+
+Updating
+  Limpyrid tells you when a new version is available, with a link to the download page.
+  It does not replace itself: download the new zip and replace this folder.
+
+License and terms: LICENSE and TERMINOS.md.

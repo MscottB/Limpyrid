@@ -14,3 +14,6 @@ graphify-out/
 
 # Caché del revisor de diseño (impeccable)
 .impeccable/hook.cache.json
+
+# Salida del guion de empaquetado
+dist-publicar/

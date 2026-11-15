@@ -830,4 +830,17 @@ assert.deepEqual(nsis.languages, ['Spanish', 'English']);
 assert.equal(nsis.displayLanguageSelector, true);
 assert.match(readFileSync(new URL(`../src-tauri/${nsis.installerHooks}`, import.meta.url), 'utf8'), /^!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED\s*$/m, 'casilla del escritorio desmarcada');
 
+// Empaquetado: partes puras del guion (versiones, repositorio, latest.json, sumas).
+const P = await import('./empaquetar-lib.mjs');
+assert.equal(P.checkVersions({ tauri: '0.1.0', cargo: '0.1.0', npm: '0.1.0' }), '0.1.0');
+assert.equal(P.checkVersions({ tauri: '0.1.0', cargo: '0.1.0', npm: '0.1.0', tag: 'v0.1.0' }), '0.1.0');
+assert.throws(() => P.checkVersions({ tauri: '0.1.0', cargo: '0.1.1', npm: '0.1.0' }), /Cargo\.toml/);
+assert.throws(() => P.checkVersions({ tauri: '0.1.0', cargo: '0.1.0', npm: '0.1.0', tag: 'v0.2.0' }), /etiqueta/);
+assert.throws(() => P.checkVersions({ tauri: '0.1.0', cargo: '0.1.0', npm: '0.1.0', tag: '0.1.0' }), /etiqueta/);
+assert.equal(P.checkRepo({ pkgRepository: 'github:MscottB/Limpyrid', endpoint: 'https://github.com/MscottB/Limpyrid/releases/latest/download/latest.json' }), 'MscottB/Limpyrid');
+assert.throws(() => P.checkRepo({ pkgRepository: 'github:MscottB/Otro', endpoint: 'https://github.com/MscottB/Limpyrid/releases/latest/download/latest.json' }));
+const lj = P.latestJson({ version: '0.2.0', notes: 'Notas', date: '2026-12-01T00:00:00Z', signature: 'FIRMA', repo: 'MscottB/Limpyrid' });
+assert.deepEqual(lj, { version: '0.2.0', notes: 'Notas', pub_date: '2026-12-01T00:00:00Z', platforms: { 'windows-x86_64': { signature: 'FIRMA', url: 'https://github.com/MscottB/Limpyrid/releases/download/v0.2.0/Limpyrid-setup.exe' } } });
+assert.equal(P.sumsFile([{ name: 'b.zip', sha256: 'bb' }, { name: 'a.exe', sha256: 'aa' }]), 'aa  a.exe\nbb  b.zip\n');
+
 console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);

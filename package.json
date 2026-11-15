@@ -10,8 +10,10 @@
     "test": "node scripts/check-frontend.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "empaquetar": "node scripts/empaquetar.mjs"
   },
+  "repository": "github:MscottB/Limpyrid",
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@internationalized/date": "^3.12.4",
