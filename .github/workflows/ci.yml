@@ -1,0 +1,26 @@
+# Pruebas en cada push y pull request. En Windows porque la app es de Windows.
+name: Pruebas
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: rustup update stable
+      - run: npm ci
+      - run: npm test
+      - run: npm run check
+      - run: cargo test --manifest-path src-tauri/Cargo.toml

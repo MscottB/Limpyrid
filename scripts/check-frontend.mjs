@@ -843,4 +843,42 @@ const lj = P.latestJson({ version: '0.2.0', notes: 'Notas', date: '2026-12-01T00
 assert.deepEqual(lj, { version: '0.2.0', notes: 'Notas', pub_date: '2026-12-01T00:00:00Z', platforms: { 'windows-x86_64': { signature: 'FIRMA', url: 'https://github.com/MscottB/Limpyrid/releases/download/v0.2.0/Limpyrid-setup.exe' } } });
 assert.equal(P.sumsFile([{ name: 'b.zip', sha256: 'bb' }, { name: 'a.exe', sha256: 'aa' }]), 'aa  a.exe\nbb  b.zip\n');
 
+// Descargas del sitio: salen de `gh release view --json tagName,assets` y llevan los nombres sin version.
+const DS = await import('./descargas-sitio.mjs');
+const BASE = 'https://github.com/MscottB/Limpyrid/releases/latest/download';
+const assets = ['Limpyrid-setup.exe', 'Limpyrid-setup.exe.sig', 'Limpyrid-portable.zip', 'latest.json', 'SHA256SUMS.txt'].map((name) => ({ name, digest: `sha256:${name.length}` }));
+const dd = DS.descargas({ tagName: 'v0.2.0', assets });
+assert.equal(dd.version, '0.2.0');
+assert.deepEqual(dd.archivos['Limpyrid-setup.exe'], { url: `${BASE}/Limpyrid-setup.exe`, sha256: '18' });
+assert.equal(dd.archivos['Limpyrid-portable.zip'].url, `${BASE}/Limpyrid-portable.zip`);
+assert.equal(dd.archivos['Limpyrid-portable.zip'].sha256, '21');
+assert.equal(dd.archivos['latest.json'], undefined, 'solo se enlazan el instalador y el portable');
+assert.deepEqual(DS.descargas(null), {});
+assert.deepEqual(DS.descargas({}), {});
+assert.deepEqual(DS.descargas({ tagName: 'v0.2.0', assets: [] }), {});
+assert.deepEqual(DS.descargas({ tagName: 'v0.2.0', assets: assets.slice(0, 1) }), {}, 'falta el portable');
+assert.deepEqual(DS.descargas({ tagName: 'nightly', assets }), {}, 'etiqueta que no es una version');
+assert.equal(DS.descargas({ tagName: 'v0.2.0', assets: assets.map(({ name }) => ({ name })) }).archivos['Limpyrid-setup.exe'].sha256, undefined);
+const pagina = '<p>$&</p><script type="application/json" id="descargas">{}</script>';
+assert.equal(DS.rellenar(pagina, {}), pagina, 'sin datos la pagina no cambia');
+const rellena = DS.rellenar(pagina, { version: '0.2.0', archivos: { x: { url: '</script>$&' } } });
+assert.ok(rellena.startsWith('<p>$&</p><script type="application/json" id="descargas">{"version":"0.2.0"'));
+assert.equal(rellena.match(/<\/script>/g).length, 1, 'el JSON no cierra el script');
+assert.equal(DS.rellenar('<p>sin bloque</p>', dd), '<p>sin bloque</p>');
+for (const page of ['index.html', 'descargar.html']) {
+  const html = readFileSync(new URL(`../site/${page}`, import.meta.url), 'utf8');
+  assert.match(html, /<script type="application\/json" id="descargas">\{\}<\/script>/, `${page}: bloque #descargas vacio`);
+  assert.doesNotMatch(html, /windows-x64/, `${page}: nombres con version`);
+}
+assert.match(readFileSync(new URL('../site/descargar.html', import.meta.url), 'utf8'), /certutil -hashfile Limpyrid-setup\.exe SHA256/);
+
+// Flujos de GitHub: la clave solo como secreto, y las pruebas en ci.yml y publicar.yml.
+const wf = (n) => readFileSync(new URL(`../.github/workflows/${n}`, import.meta.url), 'utf8');
+const publicar = wf('publicar.yml');
+assert.deepEqual([...publicar.matchAll(/secrets\.(\w+)/g)].map((m) => m[1]).sort(), ['TAURI_SIGNING_PRIVATE_KEY', 'TAURI_SIGNING_PRIVATE_KEY_PASSWORD']);
+assert.doesNotMatch(publicar, /BEGIN|untrusted comment|dW50cnVzdGVk/, 'publicar.yml no lleva ninguna clave');
+for (const l of publicar.split('\n').filter((x) => x.includes('${{'))) assert.match(l, /^\s+(TAG|GH_TOKEN|TAURI_\w+): \$\{\{/, `solo en env: ${l.trim()}`);
+for (const n of ['ci.yml', 'publicar.yml']) for (const cmd of ['npm test', 'npm run check', 'cargo test']) assert.ok(wf(n).includes(cmd), `${n}: ${cmd}`);
+assert.match(wf('paginas.yml'), /descargas-sitio\.mjs/);
+
 console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);

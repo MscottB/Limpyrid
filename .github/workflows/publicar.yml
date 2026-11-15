@@ -1,0 +1,49 @@
+# Al empujar una etiqueta vX.Y.Z: pruebas, empaquetado firmado y version en GitHub.
+# Secretos (Settings -> Secrets and variables -> Actions): TAURI_SIGNING_PRIVATE_KEY (el contenido de la clave) y TAURI_SIGNING_PRIVATE_KEY_PASSWORD.
+name: Publicar
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - run: rustup update stable
+      - run: npm ci
+      - run: npm test
+      - run: npm run check
+      - run: cargo test --manifest-path src-tauri/Cargo.toml
+      # Las notas salen de la anotacion de la etiqueta; checkout puede dejarla sin ella, por eso se vuelve a traer.
+      - name: Notas de la version
+        run: |
+          git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
+          git tag -l --format='%(contents)' "$TAG" > notas.txt
+          [ -s notas.txt ] || echo "Limpyrid $TAG" > notas.txt
+        env:
+          TAG: ${{ github.ref_name }}
+      - name: Empaquetar
+        run: node scripts/empaquetar.mjs --tag "$TAG" --notas notas.txt
+        env:
+          TAG: ${{ github.ref_name }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      - name: Crear la version
+        run: gh release create "$TAG" dist-publicar/* --title "Limpyrid $TAG" --notes-from-tag --verify-tag
+        env:
+          TAG: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}

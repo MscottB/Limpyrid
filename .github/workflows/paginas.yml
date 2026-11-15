@@ -1,11 +1,14 @@
-# Publica la pagina de presentacion (site/) en GitHub Pages cuando cambia en main, o a mano.
+# Publica la pagina de presentacion (site/) en GitHub Pages cuando cambia en main, al terminar bien una publicacion de version, o a mano.
 # Requiere Settings -> Pages -> Source: "GitHub Actions".
 name: Página
 
 on:
   push:
     branches: [main]
-    paths: ['site/**', '.github/workflows/paginas.yml']
+    paths: ['site/**', '.github/workflows/paginas.yml', 'scripts/descargas-sitio.mjs']
+  workflow_run:
+    workflows: ['Publicar']
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -19,12 +22,25 @@ concurrency:
 
 jobs:
   publicar:
+    # Tras "Publicar" solo si terminó bien; en los demás eventos siempre.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.despliegue.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          package-manager-cache: false
+      # Sin version publicada gh falla: se sigue con un release.json vacío y el sitio sale como hasta ahora.
+      - name: Descargas de la última versión
+        run: |
+          gh release view --json tagName,assets > release.json || echo '{}' > release.json
+          node scripts/descargas-sitio.mjs release.json site/index.html site/descargar.html
+        env:
+          GH_TOKEN: ${{ github.token }}
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

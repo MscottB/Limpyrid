@@ -74,7 +74,7 @@
 })();
 
 // Descargas: al publicar una versión se rellena el bloque #descargas de la página con
-// {"version": "0.1.0", "archivos": {"instalador-windows-x64.exe": {"url": "…", "sha256": "…"}, …}}.
+// {"version": "0.1.0", "archivos": {"Limpyrid-setup.exe": {"url": "…", "sha256": "…"}, …}}.
 // Vacío ({}), no hay versión publicada: los enlaces siguen siendo los provisionales y sus avisos se quedan.
 (function () {
   var bloque = document.getElementById('descargas');
