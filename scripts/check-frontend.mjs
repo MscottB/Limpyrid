@@ -828,5 +828,6 @@ for (const f of [conf.bundle.licenseFile, nsis.installerIcon, nsis.uninstallerIc
   assert.ok(existsSync(new URL(`../src-tauri/${f}`, import.meta.url)), `${f} existe`);
 assert.deepEqual(nsis.languages, ['Spanish', 'English']);
 assert.equal(nsis.displayLanguageSelector, true);
+assert.match(readFileSync(new URL(`../src-tauri/${nsis.installerHooks}`, import.meta.url), 'utf8'), /^!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED\s*$/m, 'casilla del escritorio desmarcada');
 
-console.log(`check-frontend:${Object.keys(es).length} claves, todo en orden`);
+console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);

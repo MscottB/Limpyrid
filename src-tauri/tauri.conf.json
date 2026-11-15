@@ -43,7 +43,8 @@
         "installerIcon": "icons/icon.ico",
         "uninstallerIcon": "icons/icon.ico",
         "headerImage": "windows/cabecera.bmp",
-        "sidebarImage": "windows/lateral.bmp"
+        "sidebarImage": "windows/lateral.bmp",
+        "installerHooks": "windows/hooks.nsh"
       }
     }
   },
