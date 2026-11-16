@@ -56,9 +56,10 @@ export function pruneSelection() {
 // se pueden pasar (scripts/check-frontend.mjs lo prueba en Node con sustitutos).
 // Mientras corre, work.progress sigue los eventos clean-progress de la categoria en curso; cada categoria que termina
 // queda en work.cleaned con su propio informe.
-export async function runPlan(entries: PlanEntry[], minAge: number, clean = api.cleanCategory, removeWorktrees = api.removeWorktrees) {
+// `toTrash`: las categorias van a la Papelera; los worktrees no (los quita git) y su resultado sigue siendo `delete`.
+export async function runPlan(entries: PlanEntry[], minAge: number, toTrash: boolean, clean = api.cleanCategory, removeWorktrees = api.removeWorktrees) {
   if (work.busy) return; // su propia guarda: no depende de que cada llamador la compruebe
-  const results: { id: string; report: api.Report }[] = [];
+  const results: { id: string; report: api.Report; op: 'delete' | 'trash' }[] = [];
   let error: { id: string; code: string } | undefined;
   let off: (() => void) | undefined;
   work.busy = true;
@@ -75,13 +76,15 @@ export async function runPlan(entries: PlanEntry[], minAge: number, clean = api.
       // Tamano de la fila al pulsar (toda la categoria, no lo elegido), como lo muestra Limpieza.
       const c = work.cats?.find((x) => x.id === e.id);
       const row = { ecosystem: c?.ecosystem ?? '', size: e.kind === 'worktrees' ? (work.wt.list?.worktrees ?? []).reduce((a, w) => a + w.size, 0) : (c?.size ?? e.size) };
-      work.progress = { index: n + 1, total: entries.length, id: e.id, freed: 0, deleted: 0, expected: e.size, startedAt, ids };
+      const trash = toTrash && e.kind !== 'worktrees';
+      work.progress = { index: n + 1, total: entries.length, id: e.id, freed: 0, deleted: 0, expected: e.size, startedAt, ids, trash };
       try {
-        const report = e.kind === 'worktrees' ? await removeWorktrees(paths, minAge) : await clean(e.id, paths, minAge);
-        results.push({ id: e.id, report });
+        const report = e.kind === 'worktrees' ? await removeWorktrees(paths, minAge) : await clean(e.id, paths, minAge, toTrash);
+        results.push({ id: e.id, report, op: trash ? 'trash' : 'delete' });
         const prev = work.cleaned[e.id];
         work.cleaned[e.id] = {
-          freed: (prev?.freed ?? 0) + report.freed,
+          freed: (prev?.freed ?? 0) + (trash ? 0 : report.freed),
+          trashed: (prev?.trashed ?? 0) + (trash ? report.freed : 0),
           deleted: (prev?.deleted ?? 0) + report.deleted,
           skipped: (prev?.skipped ?? 0) + report.skipped.length,
           before: prev?.before ?? row.size, // el primero: la fila no cambia de sitio

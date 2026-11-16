@@ -66,8 +66,9 @@ export const deniedPaths = () => call<string[]>('denied_paths');
 export const children = (path: string) => call<Entry[]>('children', { path });
 export const treemap = (path: string) => call<TreeNode>('treemap', { path });
 export const categories = () => call<CategoryInfo[]>('categories');
-export const cleanCategory = (id: string, items: string[], minAgeHours: number | null) =>
-  call<Report>('clean_category', { id, items, minAgeHours });
+// toTrash: lo limpiado va a la Papelera de reciclaje; `freed` cuenta entonces lo enviado, que sigue ocupando disco.
+export const cleanCategory = (id: string, items: string[], minAgeHours: number | null, toTrash: boolean) =>
+  call<Report>('clean_category', { id, items, minAgeHours, toTrash });
 export const trashPaths = (paths: string[]) => call<Report>('trash_paths', { paths });
 export const worktrees = (minAgeHours: number | null) => call<WorktreeList>('worktrees', { minAgeHours });
 export const removeWorktrees = (paths: string[], minAgeHours: number | null) =>

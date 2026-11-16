@@ -10,7 +10,7 @@
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
   import { app, dataRev, ensureWorktrees, loadCats, loadDrives, openGroup, scanCheck, setLang, work, type View } from './state.svelte';
   import { pruneSelection, currentPlan } from './selection.svelte';
-  import { bytesOn, driveOf, recovery } from './recovery';
+  import { bytesOn, driveOf, freeing, recovery } from './recovery';
   import { navGroups } from './nav';
   import { keyAction } from './keys';
   import { t, LANGS } from './i18n';
@@ -56,7 +56,7 @@
   const drive = $derived(app.scan.root ? driveOf(app.scan.root, work.drives ?? []) : undefined);
   const driveName = $derived(drive ? drive.root.replace(/\\$/, '') : '');
   // Lo marcado que esta en esta unidad: el tramo verde de la barra.
-  const r = $derived(drive ? recovery(drive, bytesOn(currentPlan(), work.cats ?? [], drive.root)) : null);
+  const r = $derived(drive ? recovery(drive, bytesOn(freeing(currentPlan(), work.toTrash), work.cats ?? [], drive.root)) : null);
   const pct = (n: number) => (drive && drive.total ? (n / drive.total) * 100 : 0);
   const nav = $derived(navGroups(work.cats ?? [], work.wt.list?.worktrees ?? []));
   const check = $derived(scanCheck());

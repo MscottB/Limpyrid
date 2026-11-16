@@ -1,6 +1,6 @@
 // Aceptacion de los terminos de uso (TERMINOS.md). Puro: check-frontend.mjs lo carga desde Node.
 // Subir TERMS_VERSION cuando cambie lo que el aviso dice: la aceptacion anterior deja de valer y se vuelve a pedir.
-export const TERMS_VERSION = 1;
+export const TERMS_VERSION = 2; // 2: las limpiezas pueden ir a la Papelera (terms.point.1)
 
 // Cierto solo si el valor guardado es JSON valido con la version actual.
 export function termsAccepted(stored: string | null): boolean {

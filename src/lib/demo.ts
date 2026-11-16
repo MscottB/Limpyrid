@@ -215,9 +215,11 @@ const TEMP_SKIPS: Report['skipped'] = [
 ];
 const report = (freed: number, deleted: number, skipped: Report['skipped'] = []): Report => ({ freed: Math.round(freed), deleted, skipped });
 
-function cleanReport(id: string, items: string[]): Report {
+function cleanReport(id: string, items: string[], toTrash = false): Report {
   const c = CATEGORIES.find((x) => x.id === id);
   if (!c || c.kind === 'info_only' || c.kind === 'containers' || c.kind === 'worktrees') return report(0, 0, []);
+  // A la Papelera va cada entrada entera: en una cache grande, una carpeta no cabe y se queda.
+  if (toTrash && c.kind === 'contents' && c.size > gb(4)) return report(c.size * 0.6, 3, [{ path: `${c.paths[0]}\\_cacache`, reason: 'too_large' }]);
   if (c.kind === 'contents') return c.uses_min_age ? report(c.size * 0.94, 1840, TEMP_SKIPS) : report(c.size, 12_400);
   const picked = c.items.filter((i) => items.includes(i.path));
   if (c.kind === 'project') return report(picked.reduce((s, i) => s + i.size, 0), picked.length);
@@ -268,8 +270,8 @@ function finishScan(cancelled: boolean) {
 const later = <T>(value: T, ms = 150) => new Promise<T>((resolve) => setTimeout(() => resolve(value), ms));
 
 // Como clean_category en lib.rs: eventos clean-progress con lo acumulado de la categoria y uno final con el total.
-function simulateClean(id: string, items: string[]): Promise<Report> {
-  const rep = cleanReport(id, items);
+function simulateClean(id: string, items: string[], toTrash: boolean): Promise<Report> {
+  const rep = cleanReport(id, items, toTrash);
   const steps = 10;
   for (let k = 1; k <= steps; k++) {
     const share = k === steps ? 1 : (k / steps) ** 1.3;
@@ -334,7 +336,7 @@ export function demoInvoke<T>(cmd: string, args: Record<string, unknown> = {}): 
       case 'children': return later(toEntries(a.path));
       case 'treemap': return later(trim(find(a.path), 3));
       case 'categories': return later(structuredClone(CATEGORIES), 600);
-      case 'clean_category': return simulateClean(a.id, a.items);
+      case 'clean_category': return simulateClean(a.id, a.items, a.toTrash);
       case 'trash_paths': return later({ freed: sizeOf(a.paths), deleted: (a.paths as string[]).length, skipped: [] }, 400);
       case 'worktrees': return later(structuredClone(WORKTREES), 300);
       case 'remove_worktrees': {

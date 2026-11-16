@@ -51,7 +51,9 @@
 
   // "Libero X · quedan Y", y en las de elementos cuantos se quitaron; los omitidos tienen sus motivos en el informe.
   function cleanedLine(c: CategoryInfo, r: Cleaned, left: number): string {
-    const parts = [t('cleaned.summary', { freed: fmt(r.freed), left: fmt(left) })];
+    // Lo enviado a la Papelera no se cuenta como liberado.
+    const parts = [r.trashed && !r.freed ? t('cleaned.summaryTrash', { size: fmt(r.trashed), left: fmt(left) }) : t('cleaned.summary', { freed: fmt(r.freed), left: fmt(left) })];
+    if (r.trashed && r.freed) parts.push(t('cleaned.trashed', { size: fmt(r.trashed) }));
     const present = c.kind === 'worktrees' ? wtList?.worktrees.map((w) => w.path) : c.items.map((i) => i.path);
     if (c.kind !== 'contents' && present) {
       const n = r.paths.filter((p) => !present.includes(p)).length;
@@ -65,7 +67,9 @@
   const drive = $derived(app.scan.root ? driveOf(app.scan.root, work.drives ?? []) : undefined);
 
   const o = $derived(work.outcome);
-  const sum = (f: (r: api.Report) => number) => (o?.kind === 'batch' ? o.results.reduce((a, r) => a + f(r.report), 0) : 0);
+  // Con `op`, solo lo borrado (`delete`) o lo enviado a la Papelera (`trash`), que no es espacio liberado.
+  const sum = (f: (r: api.Report) => number, op?: 'delete' | 'trash') =>
+    o?.kind === 'batch' ? o.results.filter((r) => !op || r.op === op).reduce((a, r) => a + f(r.report), 0) : 0;
 </script>
 
 <div class="flex flex-col gap-5 p-4 text-[13px]">
@@ -74,8 +78,9 @@
       <h2 id="det-report" class="text-[14px] font-medium">{t(o.error ? 'batch.titleStopped' : 'report.title')}</h2>
       {#if o.error}<p class="text-destructive" role="alert">{t('batch.stopped', { name: t('cat.' + o.error.id) })} {t('err.' + o.error.code)}</p>{/if}
       <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0.5">
-        <dt class="text-muted-foreground">{t('report.freed')}</dt><dd class="num font-medium text-success">{fmt(sum((r) => r.freed))}</dd>
-        <dt class="text-muted-foreground">{t('report.deleted')}</dt><dd class="num">{sum((r) => r.deleted).toLocaleString(app.lang)}</dd>
+        <dt class="text-muted-foreground">{t('report.freed')}</dt><dd class="num font-medium text-success">{fmt(sum((r) => r.freed, 'delete'))}</dd>
+        {#if o.results.some((r) => r.op === 'trash')}<dt class="text-muted-foreground">{t('report.trashed')}</dt><dd class="num font-medium">{fmt(sum((r) => r.freed, 'trash'))}</dd>{/if}
+        <dt class="text-muted-foreground">{t(o.results.some((r) => r.op === 'trash') ? 'batch.items' : 'report.deleted')}</dt><dd class="num">{sum((r) => r.deleted).toLocaleString(app.lang)}</dd>
         <dt class="text-muted-foreground">{t('batch.skipped')}</dt><dd class="num">{sum((r) => r.skipped.length).toLocaleString(app.lang)}</dd>
       </dl>
       <div class="flex flex-wrap gap-2">

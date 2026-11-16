@@ -8,7 +8,8 @@
     | { kind: 'error'; code: string; compact?: boolean } // compact: el fallo pudo dejar el motor y WSL detenidos
     // Limpieza de la seleccion: un informe por categoria (ids, para que se traduzcan al cambiar de idioma). `error`: el
     // comando que fallo y detuvo el resto; `notRun`: las categorias que no llegaron a correr.
-    | { kind: 'batch'; results: { id: string; report: Report }[]; error?: { id: string; code: string }; notRun: string[] };
+    // `op: 'trash'`: esa categoria fue a la Papelera y su `freed` es lo enviado, no espacio liberado.
+    | { kind: 'batch'; results: { id: string; report: Report; op: 'delete' | 'trash' }[]; error?: { id: string; code: string }; notRun: string[] };
 </script>
 
 <script lang="ts">
@@ -32,7 +33,9 @@
   const skippedByReason = $derived(outcome?.kind === 'clean' ? byReason(outcome.report.skipped) : []);
   const fmt = (n: number) => formatBytes(n, app.lang);
   const catName = (id: string) => t('cat.' + id);
-  const sum = (o: Extract<Outcome, { kind: 'batch' }>, f: (r: Report) => number) => o.results.reduce((a, r) => a + f(r.report), 0);
+  // Con `op`, solo las categorias que se borraron (`delete`) o que fueron a la Papelera (`trash`).
+  const sum = (o: Extract<Outcome, { kind: 'batch' }>, f: (r: Report) => number, op?: 'delete' | 'trash') =>
+    o.results.filter((r) => !op || r.op === op).reduce((a, r) => a + f(r.report), 0);
 </script>
 
 <div class="report" aria-live="polite">
@@ -95,6 +98,8 @@
 {/snippet}
 
 {#snippet batch(o: Extract<Outcome, { kind: 'batch' }>)}
+  <!-- Lo enviado a la Papelera va en su propia columna: no es espacio liberado. -->
+  {@const binned = o.results.some((r) => r.op === 'trash')}
   {#if o.error}
     <p class="mt-2 text-destructive" role="alert">{t('batch.stopped', { name: catName(o.error.id) })} {t('err.' + o.error.code)}</p>
   {/if}
@@ -104,7 +109,8 @@
         <tr class="text-[13px] text-muted-foreground">
           <th scope="col" class="py-1.5 pr-4 font-medium">{t('batch.category')}</th>
           <th scope="col" class="num py-1.5 pr-4 font-medium">{t('report.freed')}</th>
-          <th scope="col" class="num py-1.5 pr-4 font-medium">{t('report.deleted')}</th>
+          {#if binned}<th scope="col" class="num py-1.5 pr-4 font-medium">{t('report.trashed')}</th>{/if}
+          <th scope="col" class="num py-1.5 pr-4 font-medium">{t(binned ? 'batch.items' : 'report.deleted')}</th>
           <th scope="col" class="num py-1.5 font-medium">{t('batch.skipped')}</th>
         </tr>
       </thead>
@@ -112,7 +118,8 @@
         {#each o.results as r (r.id)}
           <tr class="border-t border-border">
             <th scope="row" class="py-2 pr-4 font-normal">{catName(r.id)}</th>
-            <td class="num py-2 pr-4 font-semibold">{fmt(r.report.freed)}</td>
+            <td class="num py-2 pr-4 font-semibold">{r.op === 'trash' ? '—' : fmt(r.report.freed)}</td>
+            {#if binned}<td class="num py-2 pr-4 font-semibold">{r.op === 'trash' ? fmt(r.report.freed) : '—'}</td>{/if}
             <td class="num py-2 pr-4">{r.report.deleted.toLocaleString(app.lang)}</td>
             <td class="num py-2">{r.report.skipped.length.toLocaleString(app.lang)}</td>
           </tr>
@@ -122,13 +129,20 @@
         <tfoot>
           <tr class="border-t border-input">
             <th scope="row" class="py-2 pr-4 font-semibold">{t('batch.total')}</th>
-            <td class="num py-2 pr-4 font-semibold">{fmt(sum(o, (r) => r.freed))}</td>
+            <td class="num py-2 pr-4 font-semibold">{fmt(sum(o, (r) => r.freed, 'delete'))}</td>
+            {#if binned}<td class="num py-2 pr-4 font-semibold">{fmt(sum(o, (r) => r.freed, 'trash'))}</td>{/if}
             <td class="num py-2 pr-4">{sum(o, (r) => r.deleted).toLocaleString(app.lang)}</td>
             <td class="num py-2">{sum(o, (r) => r.skipped.length).toLocaleString(app.lang)}</td>
           </tr>
         </tfoot>
       {/if}
     </table>
+    {#if binned}
+      <p class="mt-2 text-muted-foreground">
+        {t('batch.trashNote')}
+        {#if o.results.some((r) => r.report.skipped.some((s) => s.reason === 'too_large'))}{t('batch.tooLarge')}{/if}
+      </p>
+    {/if}
     {#each o.results as r (r.id)}
       {#each byReason(r.report.skipped) as [reason, paths] (reason)}
         <details class="group mt-1">

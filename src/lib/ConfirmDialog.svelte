@@ -3,6 +3,7 @@
     title: string;
     size: string; // ya formateado
     tag?: string; // p. ej. "Definitivo"
+    trash?: boolean; // la etiqueta dice "Papelera": no lleva el color de borrado
     notes?: string[]; // avisos de la categoria (antiguedad minima, ramas que se conservan...)
     items?: { label: string; size: string }[];
     impact?: { label: string; text: string; careful: boolean }; // que conlleva limpiarla: nivel y primera frase
@@ -12,6 +13,8 @@
     before: string[]; // parrafos antes de la lista
     items?: string[];
     groups?: ConfirmGroup[]; // lista agrupada por categoria
+    // Una casilla bajo la lista (p. ej. enviar a la Papelera). `onchange` sustituye la peticion entera por la que toca.
+    option?: { label: string; note: string; checked: boolean; onchange: (on: boolean) => void };
     after: string[]; // parrafos despues de la lista
     confirmLabel: string; // nombra la accion y la cantidad
     tone?: 'danger' | 'default'; // default: confirmar algo que no borra (p. ej. escanear una unidad extraible)
@@ -22,6 +25,7 @@
   import * as Dialog from '$lib/components/ui/dialog';
   import { Button } from '$lib/components/ui/button';
   import { Badge } from '$lib/components/ui/badge';
+  import { Checkbox } from '$lib/components/ui/checkbox';
   import { t } from './i18n';
 
   let { request, onresolve }: { request: ConfirmRequest | null; onresolve: (ok: boolean) => void } = $props();
@@ -62,7 +66,7 @@
               <li class="border-b border-border py-3 last:border-b-0">
                 <div class="flex items-center gap-3">
                   <span class="min-w-0 flex-1 font-semibold">{g.title}</span>
-                  {#if g.tag}<Badge variant="destructive">{g.tag}</Badge>{/if}
+                  {#if g.tag}<Badge variant={g.trash ? 'secondary' : 'destructive'}>{g.tag}</Badge>{/if}
                   <span class="num w-24 font-semibold">{g.size}</span>
                 </div>
                 {#if g.impact}
@@ -79,6 +83,13 @@
               </li>
             {/each}
           </ul>
+        {/if}
+        {#if shown.option}
+          {@const opt = shown.option}
+          <label class="flex items-start gap-3">
+            <Checkbox class="mt-0.5" aria-label={opt.label} aria-describedby="confirm-option-note" bind:checked={() => opt.checked, (on) => opt.onchange(on)} />
+            <span class="flex flex-col gap-0.5"><span class="font-medium">{opt.label}</span><span id="confirm-option-note" class="text-[13px] text-muted-foreground">{opt.note}</span></span>
+          </label>
         {/if}
         {#each shown.after as p}<p class="font-semibold">{p}</p>{/each}
       </div>

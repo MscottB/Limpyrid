@@ -449,7 +449,7 @@ const ok = { freed: 1, deleted: 1, skipped: [] };
 let calls = [];
 const secondFails = (id) => (calls.push(id), calls.length === 2 ? Promise.reject('blocked') : Promise.resolve(ok));
 sel.setCategory('npm', true);
-await sel.runPlan([E('npm'), E('pip'), E('uv')], 168, secondFails, secondFails);
+await sel.runPlan([E('npm'), E('pip'), E('uv')], 168, false, secondFails, secondFails);
 assert.deepEqual(calls, ['npm', 'pip'], 'se detiene en el primer fallo');
 assert.deepEqual(work.outcome.results.map((x) => x.id), ['npm'], 'lo que corrio se informa');
 assert.deepEqual(work.outcome.error, { id: 'pip', code: 'blocked' }, 'el error nombra la segunda categoria');
@@ -459,20 +459,20 @@ assert.equal(sel.selection.categories.size, 0, 'algo corrio: la seleccion se vac
 // Los worktrees van por su propia funcion, con sus rutas y la antiguedad.
 calls = [];
 const wtCalls = [];
-await sel.runPlan([E('git-worktrees', 'worktrees')], 72, secondFails, (paths, age) => (wtCalls.push([paths, age]), Promise.resolve(ok)));
+await sel.runPlan([E('git-worktrees', 'worktrees')], 72, false, secondFails, (paths, age) => (wtCalls.push([paths, age]), Promise.resolve(ok)));
 assert.deepEqual([calls, wtCalls], [[], [[['C:\\git-worktrees'], 72]]], 'worktrees por removeWorktrees');
 // Con busy no corre nada.
 calls = [];
 work.busy = true;
 work.outcome = 'antes';
-await sel.runPlan([E('npm')], 168, secondFails, secondFails);
+await sel.runPlan([E('npm')], 168, false, secondFails, secondFails);
 assert.deepEqual(calls, [], 'con busy no corre nada');
 assert.equal(work.outcome, 'antes', 'con busy no toca el informe');
 assert.equal(work.busy, true, 'con busy no suelta el bloqueo de otro');
 work.busy = false;
 // El primer comando rechaza y no corrio nada (p. ej. scan_running): la seleccion se conserva.
 sel.setCategory('npm', true);
-await sel.runPlan([E('npm'), E('pip')], 168, () => Promise.reject('scan_running'), secondFails);
+await sel.runPlan([E('npm'), E('pip')], 168, false, () => Promise.reject('scan_running'), secondFails);
 assert.deepEqual([work.outcome.results, work.outcome.error, work.outcome.notRun], [[], { id: 'npm', code: 'scan_running' }, ['pip']]);
 assert.ok(sel.selection.categories.has('npm'), 'nada corrio: la seleccion se conserva');
 assert.equal(work.busy, false);
@@ -488,29 +488,47 @@ const withEvents = (id) => {
 };
 work.cleaned = {};
 work.cats = [{ ...C('npm', 'contents', 0), size: 10 }, C('node-projects', 'project', 3)];
-await sel.runPlan([{ ...E('npm'), size: 10 }, E('pip')], 168, withEvents, secondFails);
+await sel.runPlan([{ ...E('npm'), size: 10 }, E('pip')], 168, false, withEvents, secondFails);
 assert.equal(globalThis.__subs.length, subsBefore + 1, 'una suscripcion por ejecucion');
 assert.equal(globalThis.__unsubs, globalThis.__subs.length, 'siempre se deja de escuchar, tambien tras un fallo');
 assert.deepEqual(seenProgress.map((p) => [p.index, p.total, p.id, p.freed, p.deleted, p.expected]), [[1, 2, 'npm', 5, 2, 10], [2, 2, 'pip', 5, 2, 1]]);
 assert.equal(work.progress, null, 'sin progreso al terminar');
-assert.deepEqual(work.cleaned.npm, { freed: 7, deleted: 3, skipped: 1, before: 10, kind: 'contents', ecosystem: 'x', paths: [] }, 'informe propio de la categoria');
+assert.deepEqual(work.cleaned.npm, { freed: 7, trashed: 0, deleted: 3, skipped: 1, before: 10, kind: 'contents', ecosystem: 'x', paths: [] }, 'informe propio de la categoria');
 assert.equal(work.cleaned.pip, undefined, 'la que fallo no queda como limpiada');
 // Con busy no se escucha nada.
 work.busy = true;
-await sel.runPlan([E('npm')], 168, withEvents, secondFails);
+await sel.runPlan([E('npm')], 168, false, withEvents, secondFails);
 assert.equal(globalThis.__subs.length, subsBefore + 1, 'con busy no se suscribe');
 work.busy = false;
 // `before` es el tamano de la fila al pulsar (no el de lo elegido): una limpieza parcial no la cambia de sitio.
-await sel.runPlan([E('node-projects', 'project')], 168, withEvents, secondFails);
+await sel.runPlan([E('node-projects', 'project')], 168, false, withEvents, secondFails);
 assert.equal(work.cleaned['node-projects'].before, 3 * GB, 'limpieza parcial: before es el tamano de toda la fila');
 assert.deepEqual(seenProgress.at(-1).expected, 1, 'la barra sigue usando lo elegido');
 work.wt.list = { git: true, worktrees: [wt('w1', 2), wt('w2', 5, ['recent'])], orphans: [] };
-await sel.runPlan([E('git-worktrees', 'worktrees')], 168, withEvents, () => Promise.resolve(ok));
+await sel.runPlan([E('git-worktrees', 'worktrees')], 168, false, withEvents, () => Promise.resolve(ok));
 assert.equal(work.cleaned['git-worktrees'].before, 7 * GB, 'worktrees: la suma de la lista, como la fila');
 // Limpiar otra vez la misma categoria acumula lo liberado y conserva el primer `before`.
 work.cats[0].size = 2;
-await sel.runPlan([{ ...E('npm'), size: 2 }], 168, withEvents, secondFails);
+await sel.runPlan([{ ...E('npm'), size: 2 }], 168, false, withEvents, secondFails);
 assert.deepEqual([work.cleaned.npm.freed, work.cleaned.npm.deleted, work.cleaned.npm.skipped, work.cleaned.npm.before], [14, 6, 2, 10], 'se acumula en la sesion');
+// A la Papelera: la API recibe toTrash, lo enviado no cuenta como liberado y los worktrees (git) siguen siendo definitivos.
+work.cleaned = {};
+const trashCalls = [];
+const steps = [];
+const toBin = (id, _paths, _age, toTrash) => (trashCalls.push([id, toTrash]), steps.push(work.progress.trash), Promise.resolve({ freed: 7, deleted: 3, skipped: [] }));
+await sel.runPlan([E('npm'), E('git-worktrees', 'worktrees')], 168, true, toBin, () => (steps.push(work.progress.trash), Promise.resolve(ok)));
+assert.deepEqual(trashCalls, [['npm', true]], 'clean recibe toTrash');
+assert.deepEqual(steps, [true, false], 'el progreso sabe que paso va a la Papelera');
+assert.deepEqual(work.outcome.results.map((x) => [x.id, x.op]), [['npm', 'trash'], ['git-worktrees', 'delete']], 'cada resultado dice si fue a la Papelera');
+assert.deepEqual([work.cleaned.npm.freed, work.cleaned.npm.trashed], [0, 7], 'lo enviado a la Papelera no es espacio liberado');
+assert.deepEqual([work.cleaned['git-worktrees'].freed, work.cleaned['git-worktrees'].trashed], [1, 0], 'los worktrees si liberan');
+await sel.runPlan([E('npm')], 168, false, toBin, secondFails);
+assert.deepEqual([trashCalls.at(-1), work.cleaned.npm.freed, work.cleaned.npm.trashed], [['npm', false], 7, 7], 'sin Papelera: borrado definitivo, cada cifra en su cuenta');
+// La prevision de espacio libre solo cuenta lo que se borra de verdad.
+const { freeing } = await import('../src/lib/recovery.ts');
+const mixed = [E('npm'), E('node-projects', 'project'), E('git-worktrees', 'worktrees')];
+assert.deepEqual(freeing(mixed, false), mixed, 'borrado definitivo: todo libera');
+assert.deepEqual(freeing(mixed, true).map((e) => e.id), ['git-worktrees'], 'a la Papelera solo liberan los worktrees');
 
 // Claves que el codigo arma o elige con un ternario (el escaneo de t('...') no las ve).
 const T17_KEYS = [
@@ -710,9 +728,9 @@ assert.deepEqual(callers(/\bresolveConfirm\b/), ['App.svelte', 'lib/guard.svelte
 // selection.svelte.ts, con su estado, la API, i18n y la seleccion sustituidos; $state es un objeto plano.
 const G_STUBS = {
   './api': "export const errCode = (e) => (typeof e === 'string' ? e : 'command_failed');",
-  './state.svelte': 'const g = globalThis.__guard; export const app = g.app; export const work = g.work; export const dataRev = g.dataRev; export const ensureTerms = () => g.ensureTerms(); export const locked = () => g.work.busy || g.app.scan.status === "running";',
+  './state.svelte': 'const g = globalThis.__guard; export const app = g.app; export const work = g.work; export const dataRev = g.dataRev; export const ensureTerms = () => g.ensureTerms(); export const locked = () => g.work.busy || g.app.scan.status === "running"; export const setToTrash = (on) => { g.work.toTrash = on; };',
   './i18n': 'export const t = (k) => k;',
-  './selection.svelte': 'export const currentPlan = () => []; export const runPlan = async () => {};',
+  './selection.svelte': 'const g = globalThis.__guard; export const currentPlan = () => g.plan ?? []; export const runPlan = async (...a) => { g.planRun = a; };',
 };
 registerHooks({
   resolve(spec, ctx, next) {
@@ -772,6 +790,31 @@ for (const lock of [() => (gs.work.busy = true), () => (gs.app.scan.status = 'ru
   gs.work.busy = false;
   gs.app.scan.status = 'done';
 }
+// cleanSelection: la casilla de la Papelera rehace la confirmacion, se recuerda y lo ejecutado sale del valor mostrado.
+// Los worktrees los quita git: su grupo sigue siendo definitivo, y si solo hay worktrees no hay casilla.
+const gWt = { id: 'git-worktrees', kind: 'worktrees', usesMinAge: true, items: [{ path: 'C:\\w', size: 1 }], size: 1 };
+const shown = () => { const q = guardMod.confirm.req; return [q.option?.checked, q.after, q.groups.map((x) => x.tag), q.confirmLabel]; };
+gs.plan = [{ id: 'npm', kind: 'contents', usesMinAge: false, items: [], size: 5 }, gWt];
+Object.assign(gs.work, { toTrash: false, minAge: 168 });
+await guardMod.cleanSelection();
+assert.deepEqual(shown(), [false, ['confirm.permanent'], ['sel.permanent', 'sel.permanent'], 'confirm.cleanUpTo'], 'por defecto, borrado definitivo');
+guardMod.confirm.req.option.onchange(true);
+assert.equal(gs.work.toTrash, true, 'la eleccion se recuerda');
+assert.deepEqual(shown(), [true, ['confirm.trash', 'confirm.trashExcept'], ['sel.trash', 'sel.permanent'], 'confirm.cleanUpTo'], 'Papelera con worktrees: ellos siguen definitivos');
+await guardMod.resolveConfirm(true);
+assert.deepEqual(gs.planRun.slice(1), [168, true], 'se ejecuta lo que la confirmacion mostraba');
+gs.plan = [gs.plan[0]];
+await guardMod.cleanSelection();
+assert.deepEqual(shown(), [true, ['confirm.trash'], ['sel.trash'], 'confirm.trashUpTo'], 'recordada: la siguiente confirmacion la trae marcada');
+guardMod.confirm.req.option.onchange(false);
+await guardMod.resolveConfirm(true);
+assert.deepEqual([gs.planRun[2], gs.work.toTrash], [false, false], 'desmarcada: borrado definitivo');
+gs.work.toTrash = true;
+gs.plan = [gWt];
+await guardMod.cleanSelection();
+assert.deepEqual(shown(), [undefined, ['confirm.permanent'], ['sel.permanent'], 'confirm.cleanUpTo'], 'solo worktrees: sin casilla');
+await guardMod.resolveConfirm(true);
+assert.equal(gs.planRun[2], false, 'solo worktrees: nunca a la Papelera');
 
 // La limpieza de restos del actualizador no puede borrar de forma recursiva.
 assert.ok(!readFileSync(new URL('../src-tauri/src/updates.rs', import.meta.url), 'utf8').includes('remove_dir_all'), 'updates.rs sin remove_dir_all');

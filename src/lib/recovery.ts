@@ -94,6 +94,10 @@ export function bytesOn(entries: PlanEntry[], cats: CategoryInfo[], root: string
   return sum;
 }
 
+// Lo que de verdad libera espacio al limpiar: con la Papelera solo los worktrees (git los quita de forma definitiva);
+// el resto sigue ocupando disco hasta vaciarla.
+export const freeing = (entries: PlanEntry[], toTrash: boolean): PlanEntry[] => (toTrash ? entries.filter((e) => e.kind === 'worktrees') : entries);
+
 // Lo que se enviaria con la seleccion actual, filtrado contra los datos cargados: una ruta que ya no esta o que ya
 // no se puede seleccionar se descarta. Sin lista de worktrees cargada no entra ningun worktree.
 export function plan(cats: CategoryInfo[], worktrees: Worktree[] | null, sel: Selection): PlanEntry[] {

@@ -56,7 +56,7 @@ npm run tauri dev
 
 ## Términos y licencia
 
-Copyright © 2026 Pergamio. Software libre bajo `GPL-3.0-or-later` ([LICENSE](LICENSE)). Limpyrid borra archivos de forma definitiva y se entrega tal cual, sin garantías: revisa la lista antes de confirmar. Los términos de uso están en [TERMINOS.md](TERMINOS.md).
+Copyright © 2026 Pergamio. Software libre bajo `GPL-3.0-or-later` ([LICENSE](LICENSE)). Limpyrid borra archivos, de forma definitiva si no eliges la Papelera, y se entrega tal cual, sin garantías: revisa la lista antes de confirmar. Los términos de uso están en [TERMINOS.md](TERMINOS.md).
 
 ---
 
@@ -64,6 +64,6 @@ Copyright © 2026 Pergamio. Software libre bajo `GPL-3.0-or-later` ([LICENSE](LI
 
 **Limpyrid is a Windows desktop app that shows what is using your disk and carefully cleans what developer tools leave behind:** package caches, folders that can be rebuilt, git worktrees, Docker data and temporary files from AI agents. Before anything is deleted, it tells you what each item is and what happens if you clean it.
 
-Nothing is deleted without a confirmation that lists every item, system folders are blocked in the backend, and it sends no data from your computer: it only connects to GitHub to check for a new version, which you can turn off, and to download an update you accept. Version 0.1.0 is in preparation: there is no published installer yet, so for now you build it from source with `npm install` and `npm run tauri dev`.
+Nothing is deleted without a confirmation that lists every item and lets you send the cleanup to the Recycle Bin instead of deleting it permanently, system folders are blocked in the backend, and it sends no data from your computer: it only connects to GitHub to check for a new version, which you can turn off, and to download an update you accept. Version 0.1.0 is in preparation: there is no published installer yet, so for now you build it from source with `npm install` and `npm run tauri dev`.
 
 [Site](https://mscottb.github.io/Limpyrid/) · Free software under `GPL-3.0-or-later`, provided as is, with no warranty. Copyright © 2026 Pergamio.

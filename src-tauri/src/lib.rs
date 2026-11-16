@@ -61,12 +61,13 @@ async fn categories(app: AppHandle) -> Result<Vec<CategoryInfo>, String> {
 }
 
 #[tauri::command]
-async fn clean_category(app: AppHandle, id: String, items: Vec<String>, min_age_hours: Option<u64>) -> Result<clean::Report, String> {
+async fn clean_category(app: AppHandle, id: String, items: Vec<String>, min_age_hours: Option<u64>, to_trash: bool) -> Result<clean::Report, String> {
     blocking(move || {
         let emit = |freed: u64, deleted: u64| {
             let _ = app.emit("clean-progress", json!({ "id": id, "freed": freed, "deleted": deleted }));
         };
-        commands::clean_category_with(&app.state::<AppState>(), catalog::CATALOG, &id, &items, min_age_hours, &emit)
+        let to_trash = to_trash.then_some(clean::recycle as clean::Recycle);
+        commands::clean_category_with(&app.state::<AppState>(), catalog::CATALOG, &id, &items, min_age_hours, &emit, to_trash)
     })
     .await
 }

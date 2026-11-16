@@ -332,12 +332,22 @@ pub fn should_emit(last_ms: u64, now_ms: u64) -> bool {
 }
 
 pub fn clean_category(state: &AppState, catalog: &[Category], id: &str, items: &[String], min_age_hours: Option<u64>) -> Res<Report> {
-    clean_category_with(state, catalog, id, items, min_age_hours, &|_, _| {})
+    clean_category_with(state, catalog, id, items, min_age_hours, &|_, _| {}, None)
 }
 
 // `emit` recibe (liberado, borrados) acumulados de toda la categoria, sumando sus rutas: espaciado con should_emit y una
 // ultima vez con los totales del informe. Solo observa; ningun candado se tiene mientras se llama.
-pub fn clean_category_with(state: &AppState, catalog: &[Category], id: &str, items: &[String], min_age_hours: Option<u64>, emit: clean::OnProgress) -> Res<Report> {
+// `to_trash`: lo que se limpiaria va a la Papelera (clean::trash_entry) tras las mismas comprobaciones; el informe cuenta
+// entonces lo enviado, no lo liberado.
+pub fn clean_category_with(
+    state: &AppState,
+    catalog: &[Category],
+    id: &str,
+    items: &[String],
+    min_age_hours: Option<u64>,
+    emit: clean::OnProgress,
+    to_trash: Option<clean::Recycle>,
+) -> Res<Report> {
     let _work = begin_work(state)?;
     let cat = catalog.iter().find(|c| c.id == id).ok_or("unknown_category")?;
     let age = catalog::effective_min_age(cat, min_age_hours);
@@ -355,7 +365,7 @@ pub fn clean_category_with(state: &AppState, catalog: &[Category], id: &str, ite
         Kind::Contents { .. } => {
             for p in cat.paths.iter().flat_map(|p| catalog::expand(p)) {
                 let (f0, n0) = (rep.freed, rep.deleted);
-                absorb(&mut rep, clean::delete_contents_except_with(&p, age, cat.exclude, &|f, n| tick(f0 + f, n0 + n)));
+                absorb(&mut rep, clean::delete_contents_except_with(&p, age, cat.exclude, &|f, n| tick(f0 + f, n0 + n), to_trash));
                 refresh(state, &p);
             }
         }
@@ -365,14 +375,17 @@ pub fn clean_category_with(state: &AppState, catalog: &[Category], id: &str, ite
             }
             let allowed: Vec<String> = detected(state).into_iter().filter(|f| f.category == cat.id).map(|f| f.path).collect();
             let dirs = split_allowed(items, &allowed, &mut rep);
-            absorb(&mut rep, clean::delete_dirs_with(&dirs, &tick));
+            absorb(&mut rep, match to_trash {
+                Some(send) => clean::trash_with(&dirs, send, &tick),
+                None => clean::delete_dirs_with(&dirs, &tick),
+            });
             dirs.iter().for_each(|d| refresh(state, d));
         }
         Kind::Subfolders { .. } => {
             let allowed: Vec<String> = catalog::subfolder_paths(cat).iter().map(|p| scan::plain(p)).collect();
             for dir in split_allowed(items, &allowed, &mut rep) {
                 let (f0, n0) = (rep.freed, rep.deleted);
-                absorb(&mut rep, clean::delete_contents_except_with(&dir, age, &[], &|f, n| tick(f0 + f, n0 + n)));
+                absorb(&mut rep, clean::delete_contents_except_with(&dir, age, &[], &|f, n| tick(f0 + f, n0 + n), to_trash));
                 let _ = fs::remove_dir(scan::verbatim(&dir)); // solo desaparece si quedo vacia
                 refresh(state, &dir);
             }
@@ -730,15 +743,78 @@ mod tests {
         set_env("LIMPYRID_T20_A", a.path());
         set_env("LIMPYRID_T20_B", b.path());
         let seen = Mutex::new(vec![]);
-        let rep = clean_category_with(&AppState::default(), &[CAT], "t-prog", &[], None, &|f, n| seen.lock().unwrap().push((f, n))).unwrap();
+        let rep = clean_category_with(&AppState::default(), &[CAT], "t-prog", &[], None, &|f, n| seen.lock().unwrap().push((f, n)), None).unwrap();
         let seen = seen.into_inner().unwrap();
         assert_eq!((rep.freed, rep.deleted), (600, 3));
         assert_eq!(seen.last(), Some(&(600, 3)), "el ultimo evento lleva el total de la categoria");
         assert!(seen.windows(2).all(|w| w[0].0 <= w[1].0 && w[0].1 <= w[1].1), "{seen:?}");
         // Un rechazo no emite nada.
         let seen = Mutex::new(vec![]);
-        assert!(clean_category_with(&AppState::default(), &[CAT], "no-existe", &[], None, &|f, n| seen.lock().unwrap().push((f, n))).is_err());
+        assert!(clean_category_with(&AppState::default(), &[CAT], "no-existe", &[], None, &|f, n| seen.lock().unwrap().push((f, n)), None).is_err());
         assert!(seen.into_inner().unwrap().is_empty());
+    }
+
+    // Papelera simulada: rechaza `grande.bin` como Windows con lo que no cabe; el resto va a la de verdad.
+    fn no_cabe(p: &Path) -> Result<(), trash::Error> {
+        if p.ends_with("grande.bin") {
+            return Err(trash::Error::Os { code: 0x8027_0037_u32 as i32, description: String::new() });
+        }
+        clean::recycle(p)
+    }
+
+    // Una categoria de contenido a la papelera: lo que no cabe se queda en el disco, en el informe y en el arbol.
+    #[test]
+    fn contenido_a_papelera_no_cabe() {
+        const CAT: Category = Category { id: "t-pap", ecosystem: "test", paths: &[r"%LIMPYRID_T22_PAP%"], kind: Kind::Contents { min_age_hours: 0 }, exclude: &["claude"] };
+        let t = tempfile::tempdir().unwrap();
+        let long = fs::canonicalize(t.path()).unwrap(); // forma larga, como las rutas del catalogo
+        file(&t.path().join("grande.bin"), 2 * MB);
+        file(&t.path().join("chico/x.bin"), MB);
+        file(&t.path().join("claude/y.bin"), MB);
+        set_env("LIMPYRID_T22_PAP", t.path());
+        let st = state_with_scan(&long);
+        let seen = Mutex::new(vec![]);
+        let rep = clean_category_with(&st, &[CAT], "t-pap", &[], None, &|f, n| seen.lock().unwrap().push((f, n)), Some(no_cabe)).unwrap();
+        assert!(t.path().join("grande.bin").exists() && t.path().join("claude/y.bin").exists());
+        assert!(!t.path().join("chico").exists());
+        assert_eq!((rep.freed, rep.deleted), (MB as u64, 1));
+        assert_eq!(rep.skipped.len(), 1);
+        assert!(rep.skipped[0].path.ends_with("grande.bin") && rep.skipped[0].reason == SkipReason::TooLarge);
+        assert_eq!(seen.into_inner().unwrap().last(), Some(&(MB as u64, 1)));
+        assert_eq!(categories(&st, &[CAT])[0].size, 2 * MB as u64, "el arbol queda al dia: sigue lo que no cabia, sin lo excluido");
+    }
+
+    // Proyectos y subcarpetas a la papelera: las mismas listas permitidas y la misma antiguedad que el borrado.
+    #[test]
+    fn proyectos_y_subcarpetas_a_papelera() {
+        let t = tempfile::tempdir().unwrap();
+        file(&t.path().join("proj/package.json"), 10);
+        file(&t.path().join("proj/node_modules/a.bin"), MB);
+        file(&t.path().join("otro/node_modules/b.bin"), MB); // sin package.json: no es detectable
+        let st = state_with_scan(t.path());
+        let (dentro, fuera) = (s(&t.path().join("proj/node_modules")), s(&t.path().join("otro/node_modules")));
+        let rep = clean_category_with(&st, CATALOG, "node-projects", &[dentro, fuera.clone()], None, &|_, _| {}, Some(clean::recycle)).unwrap();
+        assert!(!t.path().join("proj/node_modules").exists() && t.path().join("proj/package.json").exists());
+        assert!(t.path().join("otro/node_modules/b.bin").exists(), "fuera de la lista no se toca");
+        assert_eq!((rep.freed, rep.deleted), (MB as u64, 1));
+        assert!(rep.skipped.iter().any(|k| k.path == fuera && k.reason == SkipReason::Blocked));
+
+        const SUB: Category = Category { id: "t-sub-pap", ecosystem: "test", paths: &[r"%LIMPYRID_T22_SUB%"], kind: Kind::Subfolders { min_age_hours: 24 }, exclude: &[] };
+        let u = tempfile::tempdir().unwrap();
+        file(&u.path().join("vieja/v/x.bin"), 10);
+        file(&u.path().join("mixta/v/x.bin"), 10);
+        file(&u.path().join("mixta/n/y.bin"), 10);
+        let old = SystemTime::now() - Duration::from_secs(10 * 24 * 3600);
+        for p in ["vieja/v/x.bin", "vieja/v", "mixta/v/x.bin", "mixta/v"] {
+            File::options().write(true).custom_flags(0x0200_0000).open(u.path().join(p)).unwrap().set_modified(old).unwrap();
+        }
+        set_env("LIMPYRID_T22_SUB", u.path());
+        let items: Vec<String> = catalog::subfolder_paths(&SUB).iter().map(|p| scan::plain(p)).collect();
+        let rep = clean_category_with(&AppState::default(), &[SUB], "t-sub-pap", &items, None, &|_, _| {}, Some(clean::recycle)).unwrap();
+        assert!(!u.path().join("vieja").exists(), "vacia tras enviar su contenido: desaparece");
+        assert!(!u.path().join("mixta/v").exists() && u.path().join("mixta/n/y.bin").exists());
+        assert_eq!((rep.freed, rep.deleted), (20, 2));
+        assert!(rep.skipped.iter().any(|k| k.path.ends_with("n") && k.reason == SkipReason::TooRecent));
     }
 
     #[test]

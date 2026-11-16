@@ -236,10 +236,11 @@ pub fn delete_contents(dir: &Path, min_age: Option<Duration>) -> Report {
 
 // `exclude`: nombres de primer nivel (sin distinguir mayusculas) que no se visitan: ni se borran, ni cuentan, ni se listan.
 pub fn delete_contents_except(dir: &Path, min_age: Option<Duration>, exclude: &[&str]) -> Report {
-    delete_contents_except_with(dir, min_age, exclude, QUIET)
+    delete_contents_except_with(dir, min_age, exclude, QUIET, None)
 }
 
-pub fn delete_contents_except_with(dir: &Path, min_age: Option<Duration>, exclude: &[&str], on: OnProgress) -> Report {
+// `to_trash`: cada entrada de primer nivel que pasa las mismas comprobaciones va entera a la Papelera en vez de borrarse.
+pub fn delete_contents_except_with(dir: &Path, min_age: Option<Duration>, exclude: &[&str], on: OnProgress, to_trash: Option<Recycle>) -> Report {
     let mut rep = Report::default();
     // Una carpeta de catalogo que es un enlace se rechaza: su destino real nunca pasa por is_blocked.
     let is_link = fs::symlink_metadata(verbatim(dir)).is_ok_and(|m| m.file_attributes() & REPARSE_POINT != 0);
@@ -271,7 +272,10 @@ pub fn delete_contents_except_with(dir: &Path, min_age: Option<Duration>, exclud
                 continue;
             }
         }
-        remove_entry(&path, &mut rep, on);
+        match to_trash {
+            Some(send) => trash_entry(&path, &mut rep, send, on),
+            None => remove_entry(&path, &mut rep, on),
+        }
     }
     rep
 }
@@ -315,24 +319,40 @@ fn trash_reason(e: &trash::Error) -> SkipReason {
     }
 }
 
+// Envia una entrada a la Papelera de reciclaje. La de verdad es `recycle`; las pruebas pasan otra para simular un rechazo.
+pub type Recycle = fn(&Path) -> Result<(), trash::Error>;
+
+pub fn recycle(path: &Path) -> Result<(), trash::Error> {
+    trash::delete(plain(path)) // la papelera de Windows no acepta el prefijo \\?\
+}
+
+// `path` ya paso el bloqueo. Lo que la papelera rechaza (no cabe, en uso, unidad sin papelera) no se borra: se omite.
+// En `freed` y `deleted` va lo enviado: sigue ocupando disco hasta que se vacie la papelera.
+fn trash_entry(path: &Path, rep: &mut Report, send: Recycle, on: OnProgress) {
+    let v = verbatim(path);
+    if matches!(fs::symlink_metadata(&v), Err(e) if e.kind() == ErrorKind::NotFound) {
+        return;
+    }
+    let (bytes, files) = measure(&v);
+    match send(&v) {
+        Ok(()) => {
+            rep.freed += bytes;
+            rep.deleted += files;
+            on(rep.freed, rep.deleted);
+        }
+        Err(e) => rep.skip(path, trash_reason(&e)),
+    }
+}
+
 pub fn trash(paths: &[PathBuf]) -> Report {
+    trash_with(paths, recycle, QUIET)
+}
+
+pub fn trash_with(paths: &[PathBuf], send: Recycle, on: OnProgress) -> Report {
     let mut rep = Report::default();
     for p in paths {
-        if rep.blocked(p) {
-            continue;
-        }
-        let v = verbatim(p);
-        if matches!(fs::symlink_metadata(&v), Err(e) if e.kind() == ErrorKind::NotFound) {
-            continue;
-        }
-        let (bytes, files) = measure(&v);
-        // La papelera de Windows no acepta el prefijo \\?\.
-        match trash::delete(plain(&v)) {
-            Ok(()) => {
-                rep.freed += bytes;
-                rep.deleted += files;
-            }
-            Err(e) => rep.skip(p, trash_reason(&e)),
+        if !rep.blocked(p) {
+            trash_entry(p, &mut rep, send, on);
         }
     }
     rep
@@ -704,7 +724,7 @@ mod tests {
             file(&d.join(n), b);
         }
         let seen = std::sync::Mutex::new(vec![]);
-        let r = delete_contents_except_with(&d, None, &[], &|f, n| seen.lock().unwrap().push((f, n)));
+        let r = delete_contents_except_with(&d, None, &[], &|f, n| seen.lock().unwrap().push((f, n)), None);
         let seen = seen.into_inner().unwrap();
         assert!(seen.windows(2).all(|w| w[0].0 <= w[1].0 && w[0].1 <= w[1].1), "nunca baja: {seen:?}");
         assert_eq!(seen.last(), Some(&(600, 3)));
@@ -742,7 +762,7 @@ mod tests {
             let sin = delete_contents_except(&da, age, &[]);
             let con = delete_contents_except_with(&db, age, &[], &|_, _| {
                 calls.fetch_add(1, Ordering::Relaxed);
-            });
+            }, None);
             let (rs, rc) = (resumen(&sin, a.path()), resumen(&con, b.path()));
             assert_eq!(rs, rc, "{age:?}");
             // Con antiguedad se omiten el archivo reciente y la carpeta con la junction (recien creada).
@@ -757,6 +777,90 @@ mod tests {
         assert_eq!(resumen(&sin, a.path()), resumen(&con, b.path()));
         assert_eq!((con.freed, con.deleted), (600, 3));
         assert!(!db.exists() && b.path().join("fuera/keep.bin").exists());
+    }
+
+    // Papelera simulada: rechaza `grande.bin` como hace Windows con lo que no cabe; el resto va a la de verdad.
+    fn no_cabe(p: &Path) -> Result<(), trash::Error> {
+        if p.ends_with("grande.bin") {
+            return Err(trash::Error::Os { code: 0x8027_0037_u32 as i32, description: String::new() });
+        }
+        recycle(p)
+    }
+
+    fn nunca(p: &Path) -> Result<(), trash::Error> {
+        panic!("una ruta rechazada no debe llegar a la papelera: {p:?}")
+    }
+
+    // Limpieza a la papelera: mismas exclusiones, antiguedad y enlaces que el borrado; cada entrada va entera.
+    #[test]
+    fn contenido_a_papelera() {
+        let t = tempfile::tempdir().unwrap();
+        let d = arbol(t.path());
+        let r = delete_contents_except_with(&d, None, &["NUEVO.bin"], QUIET, Some(recycle));
+        assert!(d.exists() && d.join("nuevo.bin").exists(), "la carpeta y lo excluido se quedan");
+        assert!(!d.join("viejo.bin").exists() && !d.join("sub").exists());
+        assert!(t.path().join("fuera/keep.bin").exists(), "el destino de una junction no se toca");
+        assert_eq!(resumen(&r, t.path()), (400, 2, vec![]));
+
+        let t = tempfile::tempdir().unwrap();
+        let d = arbol(t.path());
+        let r = delete_contents_except_with(&d, Some(Duration::from_secs(24 * 3600)), &[], QUIET, Some(recycle));
+        assert!(!d.join("viejo.bin").exists() && d.join("nuevo.bin").exists() && d.join("sub/x.bin").exists());
+        assert_eq!((r.freed, r.deleted, r.skipped.len()), (100, 1, 2));
+        assert!(r.skipped.iter().all(|k| k.reason == SkipReason::TooRecent));
+    }
+
+    #[test]
+    fn papelera_junction_de_primer_nivel() {
+        let t = tempfile::tempdir().unwrap();
+        file(&t.path().join("fuera/keep.bin"), 10);
+        let d = t.path().join("d");
+        fs::create_dir_all(&d).unwrap();
+        junction(&d.join("link"), &t.path().join("fuera"));
+        let r = delete_contents_except_with(&d, None, &[], QUIET, Some(recycle));
+        assert!(t.path().join("fuera/keep.bin").exists());
+        assert!(!d.join("link").exists());
+        assert_eq!((r.freed, r.deleted, r.skipped.len()), (0, 0, 0));
+    }
+
+    // Lo que no cabe en la papelera no se borra: queda en su sitio y consta como omitido; el resto sigue.
+    #[test]
+    fn papelera_no_cabe_se_omite() {
+        let t = tempfile::tempdir().unwrap();
+        let d = t.path().join("d");
+        file(&d.join("grande.bin"), 1000);
+        file(&d.join("chico.bin"), 10);
+        file(&d.join("carpeta/grande.bin"), 500); // dentro de una carpeta va con ella: solo se juzga la entrada
+        let seen = std::sync::Mutex::new(vec![]);
+        let r = delete_contents_except_with(&d, None, &[], &|f, n| seen.lock().unwrap().push((f, n)), Some(no_cabe));
+        assert!(d.join("grande.bin").exists(), "no se borra de forma definitiva lo que no cabe");
+        assert!(!d.join("chico.bin").exists() && !d.join("carpeta").exists());
+        assert_eq!((r.freed, r.deleted), (510, 2));
+        assert_eq!(r.skipped.len(), 1);
+        assert!(r.skipped[0].path.ends_with("grande.bin") && r.skipped[0].reason == SkipReason::TooLarge);
+        assert_eq!(seen.into_inner().unwrap().last(), Some(&(510, 2)), "el progreso solo cuenta lo enviado");
+
+        let dirs = [d.join("grande.bin"), t.path().join("p")];
+        file(&dirs[1].join("a.bin"), 7);
+        let r = trash_with(&dirs, no_cabe, QUIET);
+        assert!(dirs[0].exists() && !dirs[1].exists());
+        assert_eq!((r.freed, r.deleted, r.skipped.len()), (7, 1, 1));
+        assert_eq!(r.skipped[0].reason, SkipReason::TooLarge);
+    }
+
+    // El bloqueo y el rechazo de enlaces van antes: la papelera ni se llama.
+    #[test]
+    fn papelera_respeta_bloqueo() {
+        let blocked = env("ProgramData").join("limpyrid-test-inexistente");
+        assert_one_blocked(&delete_contents_except_with(&blocked, None, &[], QUIET, Some(nunca)));
+        assert_one_blocked(&trash_with(&[blocked], nunca, QUIET));
+        let t = tempfile::tempdir().unwrap();
+        file(&t.path().join("real/keep.bin"), 10);
+        junction(&t.path().join("link"), &t.path().join("real"));
+        assert_one_blocked(&delete_contents_except_with(&t.path().join("link"), None, &[], QUIET, Some(nunca)));
+        assert!(t.path().join("real/keep.bin").exists());
+        let r = delete_contents_except_with(&t.path().join("no_existe"), None, &[], QUIET, Some(nunca));
+        assert_eq!((r.freed, r.deleted, r.skipped.len()), (0, 0, 0));
     }
 
     #[test]

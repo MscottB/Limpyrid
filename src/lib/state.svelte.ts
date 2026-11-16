@@ -32,6 +32,16 @@ function readAge(): number {
   return 168;
 }
 
+// Limpiar a la Papelera en vez de borrar: se elige en la confirmacion y se recuerda. Por defecto, borrado definitivo.
+const TRASH_KEY = 'limpyrid.toTrash';
+function readTrash(): boolean {
+  try {
+    return localStorage.getItem(TRASH_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export const app = $state({
   lang: initialLang(),
   view: 'home' as View,
@@ -62,6 +72,7 @@ export const work = $state({
   catsError: null as string | null, // codigo del ultimo fallo al cargar las categorias; null si la ultima carga fue bien
   rev: -1,
   minAge: readAge(),
+  toTrash: readTrash(),
   // Lista de worktrees: `rev` y `age` son el dataRev.n y la antiguedad con que se cargo.
   wt: { list: null as WorktreeList | null, rev: -1, age: -1, loading: false },
   drives: null as Drive[] | null,
@@ -76,8 +87,10 @@ export const work = $state({
 // Limpiando o escaneando no se marca ni se borra nada: una sola regla para la puerta (guard) y para los controles.
 export const locked = () => work.busy || work.updating || app.scan.status === 'running';
 
-export interface CleanRun { index: number; total: number; id: string; freed: number; deleted: number; expected: number; startedAt: number; ids: string[] }
-export interface Cleaned { freed: number; deleted: number; skipped: number; before: number; kind: CategoryKind; ecosystem: string; paths: string[] }
+// `trash`: el paso envia a la Papelera, asi que `freed` es lo enviado y no espacio liberado.
+export interface CleanRun { index: number; total: number; id: string; freed: number; deleted: number; expected: number; startedAt: number; ids: string[]; trash: boolean }
+// `trashed`: bytes enviados a la Papelera (siguen ocupando disco); `freed` solo cuenta lo borrado de forma definitiva.
+export interface Cleaned { freed: number; trashed: number; deleted: number; skipped: number; before: number; kind: CategoryKind; ecosystem: string; paths: string[] }
 
 export function setLang(lang: string) {
   app.lang = lang;
@@ -115,6 +128,15 @@ export function setMinAge(hours: number) {
     localStorage.setItem(AGE_KEY, String(hours));
   } catch {
     /* no persistir no es grave */
+  }
+}
+
+export function setToTrash(on: boolean) {
+  work.toTrash = on;
+  try {
+    localStorage.setItem(TRASH_KEY, on ? '1' : '0');
+  } catch {
+    /* no persistir no es grave: la proxima sesion vuelve al borrado definitivo */
   }
 }
 

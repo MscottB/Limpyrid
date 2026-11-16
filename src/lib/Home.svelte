@@ -6,7 +6,7 @@
   import { Checkbox } from '$lib/components/ui/checkbox';
   import { app, locked, openGroup, scanCheck, work } from './state.svelte';
   import { currentPlan, selection, setCategory } from './selection.svelte';
-  import { TOP_GROUPS, bytesOn, driveOf, groupTotals, recovery, topGroups } from './recovery';
+  import { TOP_GROUPS, bytesOn, driveOf, freeing, groupTotals, recovery, topGroups } from './recovery';
   import { levelGroup, levelHasItems, levelPick, levelTotals } from './levels';
   import { scanPercent } from './nav';
   import type { Impact } from './impact';
@@ -27,7 +27,7 @@
   const drive = $derived(app.scan.root ? driveOf(app.scan.root, work.drives ?? []) : undefined);
   const scanPct = $derived(scanPercent(progress?.bytes ?? 0, drive, app.scan.root));
   const driveName = $derived(drive ? drive.root.replace(/\\$/, '') : '');
-  const r = $derived(drive ? recovery(drive, bytesOn(currentPlan(), cats, drive.root)) : null);
+  const r = $derived(drive ? recovery(drive, bytesOn(freeing(currentPlan(), work.toTrash), cats, drive.root)) : null);
   const pct = (n: number) => (drive && drive.total ? (n / drive.total) * 100 : 0);
 
   const LEVELS: Impact[] = ['auto', 'redownload', 'rebuild', 'careful'];

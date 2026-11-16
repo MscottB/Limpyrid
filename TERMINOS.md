@@ -9,8 +9,10 @@ Si hay diferencia entre este resumen y la licencia, vale la licencia.
 
 ## Qué hace la aplicación
 
-Limpyrid borra archivos y carpetas de tu equipo. La mayoría de las limpiezas son
-definitivas: lo borrado no va a la papelera y no se puede recuperar desde la aplicación.
+Limpyrid borra archivos y carpetas de tu equipo. Si no eliges otra cosa, las limpiezas
+son definitivas: lo borrado no va a la papelera y no se puede recuperar desde la
+aplicación. Puedes elegir que una limpieza envíe los archivos a la Papelera de reciclaje;
+lo que quitan Docker, Podman o git se borra siempre de forma definitiva.
 
 ## Tu responsabilidad
 
@@ -56,7 +58,9 @@ cualquier conexión, GitHub ve tu dirección IP.
 Limpyrid is free software under the GNU General Public License, version 3 or later
 ([LICENSE](LICENSE)). If this summary and the license differ, the license prevails.
 
-Limpyrid deletes files and folders from your computer, and most cleanups are permanent.
+Limpyrid deletes files and folders from your computer. Unless you choose otherwise,
+cleanups are permanent; you can have a cleanup send files to the Recycle Bin instead,
+except for what Docker, Podman or git remove.
 You decide what is cleaned: the app shows what it will delete and asks you to confirm.
 Review the list before confirming and keep backups of anything you care about.
 

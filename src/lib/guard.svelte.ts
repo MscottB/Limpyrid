@@ -1,7 +1,7 @@
 // Puerta unica de las acciones que borran: aviso de uso, confirmacion, ocupado, accion, informe y recarga.
 // App.svelte monta el unico ConfirmDialog, que lee `confirm.req`.
 import * as api from './api';
-import { app, dataRev, ensureTerms, locked, work } from './state.svelte';
+import { app, dataRev, ensureTerms, locked, setToTrash, work } from './state.svelte';
 import { t } from './i18n';
 import { formatBytes } from './format';
 import { currentPlan, runPlan } from './selection.svelte';
@@ -28,7 +28,8 @@ export function itemLabel(e: PlanEntry, path: string): string {
   return path;
 }
 
-function group(e: PlanEntry, age: number): ConfirmGroup {
+// `trash`: este grupo va a la Papelera (nunca los worktrees, que quita git).
+function group(e: PlanEntry, age: number, trash: boolean): ConfirmGroup {
   const c = work.cats?.find((x) => x.id === e.id);
   const notes: string[] = [];
   if (e.kind === 'contents' && c?.paths.length) notes.push(t('sel.contentsOf', { paths: c.paths.join('; ') }));
@@ -39,7 +40,8 @@ function group(e: PlanEntry, age: number): ConfirmGroup {
   return {
     title: t('cat.' + e.id),
     size: fmt(e.size),
-    tag: t('sel.permanent'),
+    tag: t(trash ? 'sel.trash' : 'sel.permanent'),
+    trash,
     // careful: el texto entero, para que el aviso (y el comando que lo devuelve) se lea antes de confirmar.
     impact: { label: t('impact.' + level), text: level === 'careful' ? t('cat.' + e.id + '.effect') : firstSentence(t('cat.' + e.id + '.effect')), careful: level === 'careful' },
     notes,
@@ -54,14 +56,23 @@ export async function cleanSelection() {
   const entries = currentPlan();
   const age = work.minAge;
   const size = fmt(entries.reduce((a, e) => a + e.size, 0));
-  confirm.req = {
-    title: t(entries.length === 1 ? 'sel.confirmTitle.one' : 'sel.confirmTitle.other', { n: entries.length }),
-    before: [t('sel.confirmBody', { size })],
-    groups: entries.map((e) => group(e, age)),
-    after: [t('confirm.permanent')],
-    confirmLabel: t('confirm.cleanUpTo', { size }),
+  const git = entries.some((e) => e.kind === 'worktrees');
+  const canTrash = entries.some((e) => e.kind !== 'worktrees');
+  // La casilla rehace la confirmacion entera: lo que se lee y lo que se ejecuta salen siempre del mismo `toTrash`.
+  const ask = (toTrash: boolean) => {
+    confirm.req = {
+      title: t(entries.length === 1 ? 'sel.confirmTitle.one' : 'sel.confirmTitle.other', { n: entries.length }),
+      before: [t(toTrash && !git ? 'sel.confirmBodyTrash' : 'sel.confirmBody', { size })],
+      groups: entries.map((e) => group(e, age, toTrash && e.kind !== 'worktrees')),
+      option: canTrash
+        ? { label: t('confirm.toTrash'), note: t('confirm.toTrashNote'), checked: toTrash, onchange: (on) => (setToTrash(on), ask(on)) }
+        : undefined,
+      after: toTrash ? [t('confirm.trash'), ...(git ? [t('confirm.trashExcept')] : [])] : [t('confirm.permanent')],
+      confirmLabel: t(toTrash && !git ? 'confirm.trashUpTo' : 'confirm.cleanUpTo', { size }),
+    };
+    pending = () => runPlan(entries, age, toTrash);
   };
-  pending = () => runPlan(entries, age);
+  ask(canTrash && work.toTrash);
 }
 
 // Docker, Podman y la Papelera: acciones propias, con su confirmacion. `compact`: un fallo avisa que el motor y WSL

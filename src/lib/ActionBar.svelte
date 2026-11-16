@@ -10,7 +10,7 @@
   import { Button } from '$lib/components/ui/button';
   import { app, work } from './state.svelte';
   import { clearSelection, currentPlan, setCategory, setItems } from './selection.svelte';
-  import { bytesOn, driveOf, recovery } from './recovery';
+  import { bytesOn, driveOf, freeing, recovery } from './recovery';
   import { canClean, cleanSelection, itemLabel, staleWorktrees } from './guard.svelte';
   import { impactOf } from './impact';
   import { t } from './i18n';
@@ -25,9 +25,13 @@
 
   // Solo lo marcado en la unidad escaneada cambia sus cifras; lo de otras unidades se dice aparte.
   const drive = $derived(app.scan.root ? driveOf(app.scan.root, work.drives ?? []) : undefined);
-  const onDrive = $derived(drive ? bytesOn(plan, work.cats ?? [], drive.root) : 0);
+  // A la Papelera nada de eso libera espacio todavia: la proyeccion solo cuenta lo que se borra de verdad (`freeing`).
+  const freeable = $derived(freeing(plan, work.toTrash));
+  const freeSize = $derived(freeable.reduce((a, e) => a + e.size, 0));
+  const binned = $derived(planSize - freeSize);
+  const onDrive = $derived(drive ? bytesOn(freeable, work.cats ?? [], drive.root) : 0);
   const r = $derived(drive ? recovery(drive, onDrive) : null);
-  const elsewhere = $derived(planSize - onDrive);
+  const elsewhere = $derived(freeSize - onDrive);
 
   // Lista de marcados: se cierra sola sin seleccion o al empezar a limpiar, con Esc (este donde este el foco, salvo con
   // un dialogo abierto) y con un clic fuera de la barra. Si el foco estaba en la barra, vuelve a su boton.
@@ -126,8 +130,8 @@
         <span class="min-w-0 truncate font-semibold" title={t('cat.' + run.id)}>{t('cat.' + run.id)}</span>
         <span class="shrink-0 text-[13px] text-muted-foreground">{t('progress.step', { n: run.index, total: run.total })}</span>
         {#if bytes}
-          <span class="shrink-0 text-[13px]">{t('progress.freed', { freed: fmt(run.freed), expected: fmt(run.expected) })}</span>
-          <span class="shrink-0 text-[13px] text-muted-foreground max-[1199px]:hidden">{t(run.deleted === 1 ? 'progress.deleted.one' : 'progress.deleted.other', { n: run.deleted.toLocaleString(app.lang) })}</span>
+          <span class="shrink-0 text-[13px]">{t(run.trash ? 'progress.trashed' : 'progress.freed', { freed: fmt(run.freed), expected: fmt(run.expected) })}</span>
+          <span class="shrink-0 text-[13px] text-muted-foreground max-[1199px]:hidden">{t(`progress.${run.trash ? 'sent' : 'deleted'}.${run.deleted === 1 ? 'one' : 'other'}`, { n: run.deleted.toLocaleString(app.lang) })}</span>
           <div role="progressbar" aria-label={t('cat.' + run.id)} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} class="h-1.5 min-w-16 flex-1 overflow-hidden rounded-full bg-chart-free">
             <span class="block h-full rounded-full bg-success transition-[width] duration-150" style:width="{pct}%"></span>
           </div>
@@ -155,11 +159,12 @@
         <!-- Sin seleccion, solo el estado del disco; con ella, la proyeccion, que es un maximo (lo explica el title). -->
         <p class="flex items-center gap-2 text-[13px]" title={plan.length ? t('bar.note') : undefined}>
           <span class="text-muted-foreground">{drive.root.replace(/\\$/, '')}</span>{t('drive.free', { free: fmt(r.freeNow) })}
-          {#if plan.length}
+          {#if freeable.length}
             <ArrowRight size={14} class="text-muted-foreground" aria-hidden="true" /><span class="sr-only">{t('bar.then')}</span>
             <span class="font-semibold text-success">{t('bar.after', { free: fmt(r.freeAfter) })}</span>
             {#if elsewhere > 0}<span class="text-muted-foreground">· {t('bar.otherDrives', { size: fmt(elsewhere) })}</span>{/if}
           {/if}
+          {#if binned > 0}<span class="text-muted-foreground">· {t('bar.trash', { size: fmt(binned) })}</span>{/if}
         </p>
       {/if}
       <span class="flex-1"></span>
