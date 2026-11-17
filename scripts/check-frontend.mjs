@@ -925,6 +925,8 @@ for (const page of ['index.html', 'descargar.html']) {
   assert.doesNotMatch(html, /windows-x64/, `${page}: nombres con version`);
 }
 assert.match(readFileSync(new URL('../site/descargar.html', import.meta.url), 'utf8'), /certutil -hashfile Limpyrid-setup\.exe SHA256/);
+// Publicada sin la suma de un archivo: el <code data-suma> remite a SHA256SUMS.txt en vez de seguir diciendo "se publicara".
+assert.match(readFileSync(new URL('../site/sitio.js', import.meta.url), 'utf8'), /if \(f && f\.sha256\) c\.textContent = f\.sha256;\s*else c\.innerHTML = '<span lang="es">Consulta SHA256SUMS\.txt<\/span><span lang="en">See SHA256SUMS\.txt<\/span>';/, 'sitio.js: suma ausente');
 
 // Flujos de GitHub: la clave solo como secreto, y las pruebas en ci.yml y publicar.yml.
 const wf = (n) => readFileSync(new URL(`../.github/workflows/${n}`, import.meta.url), 'utf8');

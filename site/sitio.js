@@ -124,6 +124,7 @@
   document.querySelectorAll('[data-suma]').forEach(function (c) {
     var f = datos.archivos[c.dataset.suma];
     if (f && f.sha256) c.textContent = f.sha256;
+    else c.innerHTML = '<span lang="es">Consulta SHA256SUMS.txt</span><span lang="en">See SHA256SUMS.txt</span>';
   });
   document.querySelectorAll('[data-version]').forEach(function (v) { v.textContent = ' · v' + datos.version; });
   document.documentElement.classList.add('publicado');

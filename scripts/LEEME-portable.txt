@@ -1,22 +1,23 @@
-LIMPYRID - VERSION PORTABLE
+LIMPYRID - VERSIÓN PORTABLE
 
-Que es
-  Limpyrid analiza que ocupa el disco y limpia caches y temporales del usuario.
-  Esta version no se instala: descomprime la carpeta donde quieras y abre Limpyrid.exe.
+Qué es
+  Limpyrid analiza qué ocupa el disco y limpia cachés y temporales del usuario.
+  Esta versión no se instala: descomprime el zip en una carpeta, donde quieras, y abre Limpyrid.exe.
 
 Requisitos
   Necesita WebView2, que ya viene incluido en Windows 10 y Windows 11.
 
 Tus datos
-  "Portable" significa sin instalacion. Las preferencias (idioma, antiguedad minima,
-  aceptacion del aviso de uso) se guardan en tu perfil de usuario, igual que en la
-  version instalada, no junto al programa.
+  "Portable" significa sin instalación. Las preferencias (idioma, antigüedad mínima,
+  aceptación del aviso de uso) se guardan en tu perfil de usuario, igual que en la
+  versión instalada, no junto al programa.
 
 Actualizar
-  Limpyrid te avisa cuando hay una version nueva, con un enlace a la pagina de descarga.
-  No se reemplaza solo: descarga el zip nuevo y sustituye esta carpeta.
+  Limpyrid te avisa cuando hay una versión nueva, con un enlace a la página de descarga.
+  No se reemplaza solo: descarga el zip nuevo y sustituye los archivos de esta carpeta.
+  La consulta de versión se puede apagar en Acerca de ("Buscar actualizaciones al abrir").
 
-Licencia y terminos: LICENSE y TERMINOS.md.
+Licencia y términos: LICENSE y TERMINOS.md.
 
 ------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ LIMPYRID - PORTABLE VERSION
 
 What it is
   Limpyrid shows what is using your disk and cleans user caches and temporary files.
-  This version needs no installation: unzip the folder anywhere and open Limpyrid.exe.
+  This version needs no installation: unzip the zip into a folder of your choice and open Limpyrid.exe.
 
 Requirements
   It needs WebView2, which is already included in Windows 10 and Windows 11.
@@ -36,6 +37,7 @@ Your data
 
 Updating
   Limpyrid tells you when a new version is available, with a link to the download page.
-  It does not replace itself: download the new zip and replace this folder.
+  It does not replace itself: download the new zip and replace the files in this folder.
+  The version check can be turned off in About ("Check for updates on startup").
 
 License and terms: LICENSE and TERMINOS.md.
