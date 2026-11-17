@@ -1,6 +1,6 @@
 [package]
 name = "limpyrid"
-version = "0.1.0"
+version = "0.1.1"
 description = "Analizador de espacio en disco y limpiador de cachés para desarrolladores"
 authors = ["Pergamio"]
 license = "GPL-3.0-or-later"

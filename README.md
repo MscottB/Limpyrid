@@ -19,7 +19,7 @@ App de escritorio para Windows que muestra qué ocupa tu disco y limpia, con cui
 
 </div>
 
-> **Estado:** versión 0.1.0, la primera pública. El instalador y la versión portable están en [Descargar](https://mscottb.github.io/Limpyrid/descargar.html).
+> **Estado:** versión 0.1.1. El instalador y la versión portable están en [Descargar](https://mscottb.github.io/Limpyrid/descargar.html).
 
 ## Qué ofrece
 
