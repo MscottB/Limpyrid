@@ -19,6 +19,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -29,9 +31,11 @@ jobs:
       - run: npm run check
       - run: cargo test --manifest-path src-tauri/Cargo.toml
       # Las notas salen de la anotacion de la etiqueta; checkout puede dejarla sin ella, por eso se vuelve a traer.
+      # Una etiqueta ligera daria como notas el mensaje del commit.
       - name: Notas de la version
         run: |
           git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
+          [ "$(git cat-file -t "refs/tags/$TAG")" = tag ] || { echo "la etiqueta debe ser anotada: git tag -a"; exit 1; }
           git tag -l --format='%(contents)' "$TAG" > notas.txt
           [ -s notas.txt ] || echo "Limpyrid $TAG" > notas.txt
         env:
@@ -42,6 +46,7 @@ jobs:
           TAG: ${{ github.ref_name }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      # Si falla a medias queda un borrador de la version: hay que borrarlo antes de repetir.
       - name: Crear la version
         run: gh release create "$TAG" dist-publicar/* --title "Limpyrid $TAG" --notes-from-tag --verify-tag
         env:

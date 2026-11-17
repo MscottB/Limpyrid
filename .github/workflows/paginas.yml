@@ -22,8 +22,8 @@ concurrency:
 
 jobs:
   publicar:
-    # Tras "Publicar" solo si terminó bien; en los demás eventos siempre.
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Tras "Publicar" solo si terminó bien y lo lanzó el push de una etiqueta; en los demás eventos siempre.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

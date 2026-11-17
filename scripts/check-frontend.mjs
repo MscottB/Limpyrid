@@ -932,7 +932,11 @@ const publicar = wf('publicar.yml');
 assert.deepEqual([...publicar.matchAll(/secrets\.(\w+)/g)].map((m) => m[1]).sort(), ['TAURI_SIGNING_PRIVATE_KEY', 'TAURI_SIGNING_PRIVATE_KEY_PASSWORD']);
 assert.doesNotMatch(publicar, /BEGIN|untrusted comment|dW50cnVzdGVk/, 'publicar.yml no lleva ninguna clave');
 for (const l of publicar.split('\n').filter((x) => x.includes('${{'))) assert.match(l, /^\s+(TAG|GH_TOKEN|TAURI_\w+): \$\{\{/, `solo en env: ${l.trim()}`);
-for (const n of ['ci.yml', 'publicar.yml']) for (const cmd of ['npm test', 'npm run check', 'cargo test']) assert.ok(wf(n).includes(cmd), `${n}: ${cmd}`);
+// El paso de verdad, no un comentario que lo nombre.
+for (const n of ['ci.yml', 'publicar.yml']) for (const cmd of ['npm test', 'npm run check', 'cargo test']) assert.match(wf(n), new RegExp(`^\\s+- run: ${cmd}\\b`, 'm'), `${n}: ${cmd}`);
+assert.match(publicar, /- uses: actions\/checkout@v7\n\s+with:\n\s+persist-credentials: false\n/, 'publicar.yml: checkout sin credenciales');
+assert.match(publicar, /\[ "\$\(git cat-file -t "refs\/tags\/\$TAG"\)" = tag \] \|\| \{ echo "la etiqueta debe ser anotada: git tag -a"/, 'publicar.yml: solo etiquetas anotadas');
 assert.match(wf('paginas.yml'), /descargas-sitio\.mjs/);
+assert.match(wf('paginas.yml'), /^\s+if: .*github\.event\.workflow_run\.conclusion == 'success' && github\.event\.workflow_run\.event == 'push'$/m, 'paginas.yml: solo tras una publicacion por push de etiqueta');
 
 console.log(`check-frontend: ${Object.keys(es).length} claves, todo en orden`);
