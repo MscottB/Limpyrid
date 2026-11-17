@@ -62,9 +62,10 @@ pub fn clean_leftovers(base: &Path, app: &str) -> (usize, u64) {
     done
 }
 
-// La version portable lleva este marcador junto al ejecutable.
+// Ante la duda, portable: el instalador NSIS siempre deja uninstall.exe, y un Limpyrid.exe copiado sin su marcador
+// no debe lanzar el instalador sobre %LOCALAPPDATA%.
 pub fn is_portable(exe_dir: &Path) -> bool {
-    exe_dir.join("limpyrid.portable").is_file()
+    exe_dir.join("limpyrid.portable").is_file() || !exe_dir.join("uninstall.exe").is_file()
 }
 
 #[cfg(test)]
@@ -260,9 +261,36 @@ mod tests {
     #[test]
     fn portable_por_marcador() {
         let t = tempfile::tempdir().unwrap();
-        assert!(!is_portable(t.path()));
         file(&t.path().join("limpyrid.portable"), 0);
         assert!(is_portable(t.path()));
         assert!(t.path().join("limpyrid.portable").is_file());
+    }
+
+    #[test]
+    fn portable_sin_marcador_ni_desinstalador() {
+        let t = tempfile::tempdir().unwrap();
+        assert!(is_portable(t.path()));
+    }
+
+    #[test]
+    fn instalada_con_desinstalador() {
+        let t = tempfile::tempdir().unwrap();
+        file(&t.path().join("uninstall.exe"), 10);
+        assert!(!is_portable(t.path()));
+    }
+
+    #[test]
+    fn marcador_gana_al_desinstalador() {
+        let t = tempfile::tempdir().unwrap();
+        file(&t.path().join("uninstall.exe"), 10);
+        file(&t.path().join("limpyrid.portable"), 0);
+        assert!(is_portable(t.path()));
+    }
+
+    #[test]
+    fn desinstalador_que_es_carpeta_no_cuenta() {
+        let t = tempfile::tempdir().unwrap();
+        fs::create_dir(t.path().join("uninstall.exe")).unwrap();
+        assert!(is_portable(t.path()));
     }
 }

@@ -141,7 +141,7 @@ fn denied_paths(state: State<AppState>) -> Vec<String> {
 
 #[tauri::command]
 fn is_portable() -> bool {
-    std::env::current_exe().ok().and_then(|exe| exe.parent().map(updates::is_portable)).unwrap_or(false)
+    std::env::current_exe().ok().and_then(|exe| exe.parent().map(updates::is_portable)).unwrap_or(true)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
