@@ -26,7 +26,6 @@
   "bundle": {
     "active": true,
     "copyright": "Copyright © 2026 Pergamio",
-    "publisher": "Pergamio",
     "homepage": "https://mscottb.github.io/Limpyrid/",
     "targets": ["nsis"],
     "licenseFile": "windows/licencia.txt",
