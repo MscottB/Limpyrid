@@ -863,6 +863,11 @@ assert.match(en['about.doesNot.1'], /GitHub/);
 assert.match(es['update.privacy'], /dirección IP/);
 assert.match(en['update.privacy'], /IP address/);
 for (const d of [es, en]) for (const k of ['about.doesNot.1', 'update.privacy']) assert.doesNotMatch(d[k], /única conexión|only connection/i, k);
+// Las tres copias del parrafo de privacidad (aviso, sitio e instalador) dicen lo mismo en los dos idiomas.
+for (const f of ['../TERMINOS.md', '../site/terminos.html', '../src-tauri/windows/licencia.txt']) {
+  const txt = readFileSync(new URL(f, import.meta.url), 'utf8').replace(/\s+/g, ' ');
+  for (const phrase of ['dirección IP', 'IP address', 'descargar la actualización', 'download the update']) assert.ok(txt.includes(phrase), `${f}: ${phrase}`);
+}
 
 // Instalador: un solo NSIS, firma del actualizador y los archivos que cita la configuracion existen.
 const conf = JSON.parse(readFileSync(new URL('../src-tauri/tauri.conf.json', import.meta.url), 'utf8'));
