@@ -149,7 +149,6 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_process::init())
         .manage(AppState::default())
         .setup(|app| {
             // Mismo nombre que usa el actualizador para sus carpetas temporales.

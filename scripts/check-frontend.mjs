@@ -846,8 +846,9 @@ for (const k of ['check', 'install']) assert.ok(`err.${U.updateErrCode(k)}` in e
 assert.match(readFileSync(new URL('../src/lib/state.svelte.ts', import.meta.url), 'utf8'), /locked = \(\) =>[^\n]*work\.updating/, 'locked incluye work.updating');
 // La automatica solo corre en reposo: no pisa una comprobacion manual que ya encontro version.
 assert.match(code('App.svelte'), /if \(autoCheck\.on && update\.phase === 'idle'\) void checkNow\(false\)/, 'comprobacion automatica solo con la fase idle');
-for (const mod of ['@tauri-apps/plugin-updater', '@tauri-apps/plugin-process'])
-  assert.deepEqual(srcFiles.filter((f) => readFileSync(new URL(f, srcDir), 'utf8').includes(mod)), ['lib/api.ts'], `${mod} solo se importa en api.ts`);
+assert.deepEqual(srcFiles.filter((f) => readFileSync(new URL(f, srcDir), 'utf8').includes('@tauri-apps/plugin-updater')), ['lib/api.ts'], 'plugin-updater solo se importa en api.ts');
+// Del actualizador, solo los dos comandos que usa api.ts (check y downloadAndInstall); el instalador reabre la app.
+assert.deepEqual(JSON.parse(readFileSync(new URL('../src-tauri/capabilities/default.json', import.meta.url), 'utf8')).permissions, ['core:default', 'opener:default', 'updater:allow-check', 'updater:allow-download-and-install']);
 // Aviso, dialogo y Acerca de: claves que se eligen con un ternario.
 const UPDATE_KEYS = [
   'about.updates', 'update.notice', 'update.have', 'update.published', 'update.notes', 'update.install', 'update.openPage', 'update.later',

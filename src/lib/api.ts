@@ -5,7 +5,6 @@ import { listen } from '@tauri-apps/api/event';
 import { getVersion } from '@tauri-apps/api/app';
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { check, type Update } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
 import { updateErrCode } from './update';
 import { version } from '../../package.json';
 
@@ -97,7 +96,7 @@ export async function checkUpdate(): Promise<UpdateInfo | null> {
   }
   return pending && { version: pending.version, current: pending.currentVersion, date: pending.date ?? null, notes: pending.body ?? '' };
 }
-// Descarga, verifica la firma, instala (la app se cierra) y reinicia.
+// Descarga, verifica la firma e instala: en Windows el complemento cierra la app y el instalador (/R) la vuelve a abrir.
 export async function installUpdate(onProgress: (done: number, total: number | null) => void): Promise<void> {
   if (demo) return demo.demoInstallUpdate(onProgress);
   if (!pending) throw updateErrCode('install');
@@ -110,7 +109,6 @@ export async function installUpdate(onProgress: (done: number, total: number | n
       else if (e.event === 'Progress') done += e.data.chunkLength;
       onProgress(done, total);
     }, { timeout: 300_000 });
-    await relaunch();
   } catch {
     throw updateErrCode('install');
   }
