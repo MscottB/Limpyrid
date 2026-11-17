@@ -19,7 +19,7 @@ App de escritorio para Windows que muestra qué ocupa tu disco y limpia, con cui
 
 </div>
 
-> **Estado:** versión 0.1.0, en preparación. Todavía no hay instalador publicado; por ahora se compila desde el código.
+> **Estado:** versión 0.1.0, la primera pública. El instalador y la versión portable están en [Descargar](https://mscottb.github.io/Limpyrid/descargar.html).
 
 ## Qué ofrece
 
@@ -65,6 +65,6 @@ Copyright © 2026 Pergamio. Software libre bajo `GPL-3.0-or-later` ([LICENSE](LI
 
 **Limpyrid is a Windows desktop app that shows what is using your disk and carefully cleans what developer tools leave behind:** package caches, folders that can be rebuilt, git worktrees, Docker data and temporary files from AI agents. Before anything is deleted, it tells you what each item is and what happens if you clean it.
 
-Nothing is deleted without a confirmation that lists every item and lets you send the cleanup to the Recycle Bin instead of deleting it permanently, system folders are blocked in the backend, and it sends no data from your computer: it only connects to GitHub to check for a new version, which you can turn off, and to download an update you accept. Version 0.1.0 is in preparation: there is no published installer yet, so for now you build it from source with `npm install` and `npm run tauri dev`.
+Nothing is deleted without a confirmation that lists every item and lets you send the cleanup to the Recycle Bin instead of deleting it permanently, system folders are blocked in the backend, and it sends no data from your computer: it only connects to GitHub to check for a new version, which you can turn off, and to download an update you accept. Version 0.1.0 is the first public release: get the installer or the portable version from the [download page](https://mscottb.github.io/Limpyrid/descargar.html), or build it from source with `npm install` and `npm run tauri dev`.
 
 [Site](https://mscottb.github.io/Limpyrid/) · Free software under `GPL-3.0-or-later`, provided as is, with no warranty. Copyright © 2026 Pergamio.
