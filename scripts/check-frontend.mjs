@@ -934,7 +934,8 @@ assert.match(readFileSync(new URL('../site/descargar.html', import.meta.url), 'u
 assert.match(readFileSync(new URL('../site/sitio.js', import.meta.url), 'utf8'), /if \(f && f\.sha256\) c\.textContent = f\.sha256;\s*else c\.innerHTML = '<span lang="es">Consulta SHA256SUMS\.txt<\/span><span lang="en">See SHA256SUMS\.txt<\/span>';/, 'sitio.js: suma ausente');
 
 // Flujos de GitHub: la clave solo como secreto, y las pruebas en ci.yml y publicar.yml.
-const wf = (n) => readFileSync(new URL(`../.github/workflows/${n}`, import.meta.url), 'utf8');
+// En el runner de Windows git saca los .yml con CRLF: se normaliza para que las reglas con \n valgan alli.
+const wf = (n) => readFileSync(new URL(`../.github/workflows/${n}`, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const publicar = wf('publicar.yml');
 assert.deepEqual([...publicar.matchAll(/secrets\.(\w+)/g)].map((m) => m[1]).sort(), ['TAURI_SIGNING_PRIVATE_KEY', 'TAURI_SIGNING_PRIVATE_KEY_PASSWORD']);
 assert.doesNotMatch(publicar, /BEGIN|untrusted comment|dW50cnVzdGVk/, 'publicar.yml no lleva ninguna clave');
