@@ -888,6 +888,14 @@ assert.throws(() => P.checkRepo({ pkgRepository: 'github:MscottB/Otro', endpoint
 const lj = P.latestJson({ version: '0.2.0', notes: 'Notas', date: '2026-12-01T00:00:00Z', signature: 'FIRMA', repo: 'MscottB/Limpyrid' });
 assert.deepEqual(lj, { version: '0.2.0', notes: 'Notas', pub_date: '2026-12-01T00:00:00Z', platforms: { 'windows-x86_64': { signature: 'FIRMA', url: 'https://github.com/MscottB/Limpyrid/releases/download/v0.2.0/Limpyrid-setup.exe' } } });
 assert.equal(P.sumsFile([{ name: 'b.zip', sha256: 'bb' }, { name: 'a.exe', sha256: 'aa' }]), 'aa  a.exe\nbb  b.zip\n');
+// Clave de la firma frente a la de tauri.conf.json: texto minisign en base64 cuya segunda linea lleva algoritmo (2 bytes) e id (8).
+const b64 = (s) => Buffer.from(s).toString('base64');
+const minisign = (alg, id, rest) => b64(`untrusted comment: x\n${b64(Buffer.concat([Buffer.from(alg), Buffer.from(id, 'hex').reverse(), Buffer.alloc(rest)]))}\n`);
+const pubA = minisign('Ed', 'E0B265E21CB2F67E', 32);
+assert.equal(P.keyId(pubA), 'E0B265E21CB2F67E', 'id en el orden que muestra minisign');
+assert.equal(P.checkKey({ signature: minisign('ED', 'E0B265E21CB2F67E', 64), pubkey: pubA }), 'E0B265E21CB2F67E');
+assert.throws(() => P.checkKey({ signature: minisign('ED', '0123456789ABCDEF', 64), pubkey: pubA }), /0123456789ABCDEF.*E0B265E21CB2F67E/);
+assert.throws(() => P.checkKey({ signature: b64('sin segunda linea'), pubkey: pubA }), /firma/);
 
 // Descargas del sitio: salen de `gh release view --json tagName,assets` y llevan los nombres sin version.
 const DS = await import('./descargas-sitio.mjs');

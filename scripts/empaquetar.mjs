@@ -1,11 +1,11 @@
 // Empaqueta Limpyrid para publicar. Uso: node scripts/empaquetar.mjs [--tag vX.Y.Z] [--notas archivo]
-import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkVersions, checkRepo, latestJson, sumsFile } from './empaquetar-lib.mjs';
+import { checkVersions, checkRepo, checkKey, latestJson, sumsFile } from './empaquetar-lib.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const at = (...p) => join(root, ...p);
@@ -29,6 +29,7 @@ if (!process.env.TAURI_SIGNING_PRIVATE_KEY) fail('Falta TAURI_SIGNING_PRIVATE_KE
 const notes = notesFile ? readFileSync(notesFile, 'utf8').trim() : `Limpyrid ${version}`;
 
 // 2. Compilar.
+const buildStart = Date.now();
 const build = spawnSync('npm run tauri build', { cwd: root, stdio: 'inherit', shell: true });
 if (build.status !== 0) fail('la compilacion fallo');
 
@@ -36,6 +37,11 @@ if (build.status !== 0) fail('la compilacion fallo');
 const setup = at('src-tauri', 'target', 'release', 'bundle', 'nsis', `Limpyrid_${version}_x64-setup.exe`);
 const exe = at('src-tauri', 'target', 'release', 'limpyrid.exe');
 for (const f of [setup, `${setup}.sig`, exe]) if (!existsSync(f)) fail(`la compilacion no dejo ${f}`);
+// Un .sig de una compilacion anterior firmaria otro instalador: el actualizador lo rechazaria.
+for (const f of [setup, `${setup}.sig`]) if (statSync(f).mtimeMs < buildStart) fail(`la firma no es de esta compilacion (${f} es anterior)`);
+try {
+  console.log(`empaquetar: firma de la clave ${checkKey({ signature: readFileSync(`${setup}.sig`, 'utf8'), pubkey: conf.plugins?.updater?.pubkey ?? '' })}`);
+} catch (e) { fail(e.message); }
 
 const tmp = mkdtempSync(join(tmpdir(), 'limpyrid-empaquetar-'));
 try {

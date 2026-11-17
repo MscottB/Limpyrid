@@ -25,6 +25,22 @@ export function latestJson({ version, notes, date, signature, repo }) {
   };
 }
 
+// Id de clave de una firma o clave publica de Tauri (base64 de un texto minisign): bytes 2 a 9 de la segunda linea
+// decodificada, al reves, como lo muestra minisign. `what` nombra el dato en el error.
+export function keyId(text, what = 'la clave') {
+  const line = Buffer.from(text.trim(), 'base64').toString('utf8').split('\n')[1]?.trim() ?? '';
+  const raw = Buffer.from(line, 'base64');
+  if (raw.length < 10) throw new Error(`No se pudo leer el identificador de ${what}`);
+  return [...raw.subarray(2, 10)].reverse().map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+export function checkKey({ signature, pubkey }) {
+  const a = keyId(signature, 'la firma');
+  const b = keyId(pubkey, 'la clave publica de tauri.conf.json');
+  if (a !== b) throw new Error(`La firma es de la clave ${a}, pero tauri.conf.json espera ${b}: el instalador se firmo con otra clave`);
+  return a;
+}
+
 export function sumsFile(entries) {
   return [...entries].sort((x, y) => (x.name < y.name ? -1 : x.name > y.name ? 1 : 0)).map((e) => `${e.sha256}  ${e.name}\n`).join('');
 }
