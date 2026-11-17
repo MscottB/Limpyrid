@@ -844,6 +844,8 @@ assert.equal(U.autoCheckEnabled('1'), true);
 assert.deepEqual([U.updateErrCode('check'), U.updateErrCode('install')], ['update_check_failed', 'update_install_failed']);
 for (const k of ['check', 'install']) assert.ok(`err.${U.updateErrCode(k)}` in es && `err.${U.updateErrCode(k)}` in en, `err.${U.updateErrCode(k)} en los dos idiomas`);
 assert.match(readFileSync(new URL('../src/lib/state.svelte.ts', import.meta.url), 'utf8'), /locked = \(\) =>[^\n]*work\.updating/, 'locked incluye work.updating');
+// La automatica solo corre en reposo: no pisa una comprobacion manual que ya encontro version.
+assert.match(code('App.svelte'), /if \(autoCheck\.on && update\.phase === 'idle'\) void checkNow\(false\)/, 'comprobacion automatica solo con la fase idle');
 for (const mod of ['@tauri-apps/plugin-updater', '@tauri-apps/plugin-process'])
   assert.deepEqual(srcFiles.filter((f) => readFileSync(new URL(f, srcDir), 'utf8').includes(mod)), ['lib/api.ts'], `${mod} solo se importa en api.ts`);
 // Aviso, dialogo y Acerca de: claves que se eligen con un ternario.

@@ -20,13 +20,14 @@
   import ConfirmDialog, { type ConfirmRequest } from './lib/ConfirmDialog.svelte';
   import ActionBar from './lib/ActionBar.svelte';
   import { confirm, resolveConfirm } from './lib/guard.svelte';
-  import { autoCheck, checkNow } from './lib/update.svelte';
+  import { autoCheck, checkNow, update } from './lib/update.svelte';
   import UpdateDialog from './lib/UpdateDialog.svelte';
 
   // Una sola comprobacion de version por apertura, cuando la interfaz ya esta lista; la opcion se lee al vencer el plazo.
+  // Solo en reposo: si una manual ya encontro version, un fallo de la automatica borraria el aviso.
   $effect(() => {
     const id = setTimeout(() => {
-      if (autoCheck.on) void checkNow(false);
+      if (autoCheck.on && update.phase === 'idle') void checkNow(false);
     }, 5000);
     return () => clearTimeout(id);
   });
