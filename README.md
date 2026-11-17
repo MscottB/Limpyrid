@@ -33,6 +33,7 @@ Reconoce npm, pnpm, Yarn, Bun, pip, uv, Poetry, Go, Cargo, Gradle, Maven, NuGet,
 ## Cómo protege tus archivos
 
 - **Nada se borra sin confirmación**, y la confirmación lista cada elemento.
+- **Papelera opcional.** Al confirmar puedes enviar la limpieza a la Papelera de reciclaje en vez de borrarla. Lo que no cabe se omite, y Docker, Podman y los worktrees de git se quitan siempre de forma definitiva.
 - **Las carpetas del sistema están bloqueadas** en el backend, no solo en la interfaz.
 - **Solo lo que se regenera:** lo que contiene datos tuyos se muestra, pero no se ofrece limpiar.
 - **Worktrees en uso** (cambios sin commit, actividad reciente) nunca se ofrecen.
