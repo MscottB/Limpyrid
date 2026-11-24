@@ -880,6 +880,10 @@ for (const f of [conf.bundle.licenseFile, nsis.installerIcon, nsis.uninstallerIc
 assert.deepEqual(nsis.languages, ['Spanish', 'English']);
 assert.equal(nsis.displayLanguageSelector, true);
 assert.match(readFileSync(new URL(`../src-tauri/${nsis.installerHooks}`, import.meta.url), 'utf8'), /^!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED\s*$/m, 'casilla del escritorio desmarcada');
+// Arranque sin destello blanco/negro: la ventana y el <body> inicial pintan el mismo --bg que la interfaz.
+const bg = readFileSync(new URL('../src/app.css', import.meta.url), 'utf8').match(/--bg:\s*(#[0-9A-Fa-f]{6})/)[1];
+assert.equal(conf.app.windows[0].backgroundColor, bg, 'fondo de la ventana = --bg');
+assert.ok(readFileSync(new URL('../index.html', import.meta.url), 'utf8').includes(`<body style="background: ${bg}">`), 'fondo de index.html = --bg');
 
 // Empaquetado: partes puras del guion (versiones, repositorio, latest.json, sumas).
 const P = await import('./empaquetar-lib.mjs');
